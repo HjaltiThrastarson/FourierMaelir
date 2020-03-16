@@ -66,7 +66,6 @@ application/dac8311.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/in
 application/dac8311.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h
 application/dac8311.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h
 application/dac8311.obj: ../application/FFT.h
-application/dac8311.obj: ../application/fir.h
 application/dac8311.obj: ../application/dac8311.h
 
 ../application/dac8311.c: 
@@ -135,5 +134,4 @@ C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_filter.h:
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h: 
 ../application/FFT.h: 
-../application/fir.h: 
 ../application/dac8311.h: 
