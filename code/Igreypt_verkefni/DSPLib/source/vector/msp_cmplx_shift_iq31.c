@@ -33,73 +33,74 @@
 #include "../../include/DSPLib.h"
 
 /*
- * Optimized helper function for right shift operations with LEA.
+ * Optimized helper function for shift right with complex conjugate, used for
+ * inverse FFT functions.
  */    
-static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift);
+static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift);
 
 /*
- * Perform element wise left or right shift of a single source vector.
+ * Perform element wise left or right shift of a single complex source vector.
  */
-msp_status msp_shift_iq31(const msp_shift_iq31_params *params, const _iq31 *src, _iq31 *dst)
+msp_status msp_cmplx_shift_iq31(const msp_cmplx_shift_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
-    int8_t shift;               // Shift count
-    uint16_t length;            // Shift length
+    int8_t shift;
+    uint16_t length;
+    msp_shift_iq31_params shiftParams;
+    msp_cmplx_conj_iq31_params conjParams;
     
     /* Initialize the loop counter and shift variables. */
     length = params->length;
     shift = params->shift;
 
-#ifndef MSP_DISABLE_DIAGNOSTICS
-    /* Verify the shift parameter. */
-    if ((shift > 31) || (shift < -31)) {
-        return MSP_SHIFT_SIZE_ERROR;
+    /* If conjugate is not enabled use real version. */
+    if (!params->conjugate) {
+        shiftParams.shift = params->shift;
+        shiftParams.length = params->length << 1;
+        return msp_shift_iq31(&shiftParams, src, dst);
     }
+    else {
+#ifndef MSP_DISABLE_DIAGNOSTICS
+        /* Verify the shift parameter. */
+        if ((shift > 31) || (shift < -31)) {
+            return MSP_SHIFT_SIZE_ERROR;
+        }
 #endif //MSP_DISABLE_DIAGNOSTICS
 
-    /* Shift src array left for a positive shift parameter. */
-    if (shift > 0) {  
-        /* Loop through all vector elements. */
-        while (length--) {
-            /* Shift src left by the shift parameter and store to dst. */
-            *dst++ = *src++ << shift;
+        /* Shift src array left for a positive shift parameter. */
+        if (shift > 0) {
+            /* Loop through all vector elements. */
+            while (length--) {
+                /* Shift src left by the shift parameter and store to dst. */
+                *dst++ = *src++ << shift;
+                *dst++ = -(*src++ << shift);
+            }
+            return MSP_SUCCESS;
+        }
+        /* Shift src array right for a negative shift parameter. */
+        else if (shift < 0) {
+            /* Use optimized helper function. */
+            return msp_cmplx_shift_right_conj_iq31(src, dst, length, -shift);
+        }
+        else {
+            /* No shift, just return conjugate. */
+            conjParams.length = length;
+            return msp_cmplx_conj_iq31(&conjParams, src, dst);
         }
     }
-    /* Shift src array right for a negative shift parameter. */
-    else {
-        /* Use optimized helper function. */
-        return msp_shift_right_iq31(src, dst, length, -shift);
-    }
-    
-    return MSP_SUCCESS;
 }
 
 #if defined(MSP_USE_LEA)
 
 /* Shift factor lookup table. */
-const uint32_t msp_shift_right_factor_iq31[32] = {
-    0x80000000, 0x40000000, 0x20000000, 0x10000000, 
-    0x08000000, 0x04000000, 0x02000000, 0x01000000, 
-    0x00800000, 0x00400000, 0x00200000, 0x00100000, 
-    0x00080000, 0x00040000, 0x00020000, 0x00010000, 
-    0x00008000, 0x00004000, 0x00002000, 0x00001000, 
-    0x00000800, 0x00000400, 0x00000200, 0x00000100, 
-    0x00000080, 0x00000040, 0x00000020, 0x00000010, 
-    0x00000008, 0x00000004, 0x00000002, 0x00000001
-};
+extern const uint32_t msp_shift_right_factor_iq31[32];
     
-static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift)
+static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift)
 {
     int32_t shiftValue;
     int32_t *shiftVector;
+    uint32_t leaFlags;
     msp_status status;
     MSP_LEA_MPYLONGMATRIX_PARAMS *leaParams;
-    
-    /* If shift is zero and source and data are not the same array copy data. */
-    if ((shift == 0) && (src != dst)) {
-        msp_copy_iq31_params copyParams;
-        copyParams.length = length;
-        return msp_copy_iq31(&copyParams, src, dst);
-    }
     
     /* Lookup the fractional shift value. */
     shiftValue = msp_shift_right_factor_iq31[shift & 0x1f];
@@ -124,20 +125,20 @@ static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint
     /* Allocate MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_MPYLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
         
-    /* Allocate offset vector of length one. */
+    /* Allocate shift vector of length one. */
     shiftVector = (int32_t *)msp_lea_allocMemory(sizeof(int32_t)/sizeof(uint32_t));
     shiftVector[0] = shiftValue;
 
     /* Set MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
     leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(shiftVector);
-    leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(&CMPLX_REAL(dst));
     leaParams->vectorSize = length;
-    leaParams->input1Offset = 1;
+    leaParams->input1Offset = 2;
     leaParams->input2Offset = 0;
-    leaParams->outputOffset = 1;
+    leaParams->outputOffset = 2;
 
     /* Load source arguments to LEA. */
-    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(&CMPLX_REAL(src));
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
 #if (MSP_LEA_REVISION == MSP_LEA_REVISION_A)
@@ -162,23 +163,47 @@ static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint
     /* Clear DSPLib flags and enter LPM0. */
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
+    
+    /* Save flags status before invoking the next command. */
+    leaFlags = msp_lea_ifg;
+    
+    /* Rerun the shift operation for imaginary components. */
+    shiftVector[0] = -shiftValue;
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(&CMPLX_IMAG(dst));
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(&CMPLX_IMAG(src));
+    LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
+
+#if (MSP_LEA_REVISION == MSP_LEA_REVISION_A)
+    /* Invoke the patched command with interrupts enabled. */
+    LEAPMCB = cmdId | LEAITFLG1;
+#else //MSP_LEA_REVISION
+    /* Invoke the LEACMD__MPYLONGMATRIX command with interrupts enabled. */
+    LEAPMCB = LEACMD__MPYLONGMATRIX | LEAITFLG1;
+#endif //MSP_LEA_REVISION
+
+    /* Clear DSPLib flags and enter LPM0. */
+    msp_lea_ifg = 0;
+    msp_lea_enterLPM();
 
     /* Free MSP_LEA_MPYLONGMATRIX_PARAMS structure and shift vector. */
     msp_lea_freeMemory(sizeof(int32_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
     
+    /* Add flags to result. */
+    leaFlags |= msp_lea_ifg;
+    
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+    
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
-    if (msp_lea_ifg & LEACOVLIFG) {
+    if (leaFlags & LEACOVLIFG) {
         status = MSP_LEA_COMMAND_OVERFLOW;
     }
-    else if (msp_lea_ifg & LEAOORIFG) {
+    else if (leaFlags & LEAOORIFG) {
         status = MSP_LEA_OUT_OF_RANGE;
     }
-    else if (msp_lea_ifg & LEASDIIFG) {
+    else if (leaFlags & LEASDIIFG) {
         status = MSP_LEA_SCALAR_INCONSISTENCY;
     }
 #endif
@@ -190,12 +215,13 @@ static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint
 
 #else //MSP_USE_LEA
     
-static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift)
+static inline msp_status msp_cmplx_shift_right_conj_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift)
 {    
     /* Loop through all vector elements. */
     while (length--) {
-        /* Shift src right and store to dst. */
+        /* Shift src right by the negated shift parameter and store to dst. */
         *dst++ = *src++ >> shift;
+        *dst++ = -(*src++ >> shift);
     }
 
     return MSP_SUCCESS;

@@ -34,19 +34,18 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_neg_iq31(const msp_neg_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
     msp_status status;
-    MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
+    MSP_LEA_MPYLONGMATRIX_PARAMS *leaParams;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter with the vector length. */
     length = params->length;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that the data arrays are aligned and in a valid memory segment. */
-    if (!(MSP_LEA_VALID_ADDRESS(srcA, 4) &
-          MSP_LEA_VALID_ADDRESS(srcB, 4) &
+    if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
           MSP_LEA_VALID_ADDRESS(dst, 4))) {
         return MSP_LEA_INVALID_ADDRESS;
     }
@@ -62,30 +61,46 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
         msp_lea_init();
     }
         
-    /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+    /* Allocate MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
+    leaParams = (MSP_LEA_MPYLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
 
-    /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(srcB);
+    /* Set MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
+    leaParams->input2 = MSP_LEA_IQ31_CONST_NEG_ONE;
     leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
     leaParams->vectorSize = length;
     leaParams->input1Offset = 1;
-    leaParams->input2Offset = 1;
+    leaParams->input2Offset = 0;
     leaParams->outputOffset = 1;
 
     /* Load source arguments to LEA. */
-    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(srcA);
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
-    /* Invoke the LEACMD__ADDLONGMATRIX command with interrupts enabled. */
-    LEAPMCB = LEACMD__ADDLONGMATRIX | LEAITFLG1;
+#if (MSP_LEA_REVISION == MSP_LEA_REVISION_A)
+    /* Load function into code memory */
+    uint16_t cmdId = msp_lea_loadCommand(LEACMD__MPYLONGMATRIX, MSP_LEA_MPYLONGMATRIX,
+            sizeof(MSP_LEA_MPYLONGMATRIX)/sizeof(MSP_LEA_MPYLONGMATRIX[0]));
+
+#ifndef MSP_DISABLE_DIAGNOSTICS
+    /* Check the correct revision is defined and the command was loaded. */
+    if (cmdId == 0xffff) {
+        return MSP_LEA_INCORRECT_REVISION;
+    }
+#endif //MSP_DISABLE_DIAGNOSTICS
+
+    /* Invoke the patched command with interrupts enabled. */
+    LEAPMCB = cmdId | LEAITFLG1;
+#else //MSP_LEA_REVISION
+    /* Invoke the LEACMD__MPYLONGMATRIX command with interrupts enabled. */
+    LEAPMCB = LEACMD__MPYLONGMATRIX | LEAITFLG1;
+#endif //MSP_LEA_REVISION
 
     /* Clear DSPLib flags and enter LPM0. */
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
 
-    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+    /* Free MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
+    msp_lea_freeMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
     
     /* Set status flag. */
     status = MSP_SUCCESS;
@@ -107,20 +122,20 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     msp_lea_freeLock();
     return status;
 }
-    
+
 #else //MSP_USE_LEA
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_neg_iq31(const msp_neg_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter with the vector length. */
     length = params->length;
-    
+
     /* Loop through all vector elements. */
     while (length--) {
-        /* Add srcA and srcB with saturation and store result. */
-        *dst++ = __saturated_add_iq31(*srcA++, *srcB++);
+        /* Negate src and store to dst. */
+        *dst++ = -*src++;
     }
 
     return MSP_SUCCESS;

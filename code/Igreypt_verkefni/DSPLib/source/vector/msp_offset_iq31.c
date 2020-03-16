@@ -34,19 +34,21 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_offset_iq31(const msp_offset_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
+    _iq31 iq31Offset;
+    int32_t *offsetVector;
     msp_status status;
     MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter and offset. */
     length = params->length;
+    iq31Offset = params->offset;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that the data arrays are aligned and in a valid memory segment. */
-    if (!(MSP_LEA_VALID_ADDRESS(srcA, 4) &
-          MSP_LEA_VALID_ADDRESS(srcB, 4) &
+    if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
           MSP_LEA_VALID_ADDRESS(dst, 4))) {
         return MSP_LEA_INVALID_ADDRESS;
     }
@@ -64,17 +66,21 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
         
     /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+        
+    /* Allocate offset vector of length one. */
+    offsetVector = (int32_t *)msp_lea_allocMemory(sizeof(int32_t)/sizeof(uint32_t));
+    offsetVector[0] = iq31Offset;
 
     /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(srcB);
+    leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(offsetVector);
     leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
     leaParams->vectorSize = length;
     leaParams->input1Offset = 1;
-    leaParams->input2Offset = 1;
+    leaParams->input2Offset = 0;
     leaParams->outputOffset = 1;
 
     /* Load source arguments to LEA. */
-    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(srcA);
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
     /* Invoke the LEACMD__ADDLONGMATRIX command with interrupts enabled. */
@@ -84,7 +90,8 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
 
-    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
+    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure and offset vector. */
+    msp_lea_freeMemory(sizeof(int32_t)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
     
     /* Set status flag. */
@@ -107,20 +114,22 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     msp_lea_freeLock();
     return status;
 }
-    
+
 #else //MSP_USE_LEA
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_offset_iq31(const msp_offset_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
+    _iq31 iq31Offset;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter and offset. */
     length = params->length;
-    
+    iq31Offset = params->offset;
+
     /* Loop through all vector elements. */
     while (length--) {
-        /* Add srcA and srcB with saturation and store result. */
-        *dst++ = __saturated_add_iq31(*srcA++, *srcB++);
+        /* Add offset to src with saturation and store result. */
+        *dst++ = __saturated_add_iq31(*src++, iq31Offset);
     }
 
     return MSP_SUCCESS;

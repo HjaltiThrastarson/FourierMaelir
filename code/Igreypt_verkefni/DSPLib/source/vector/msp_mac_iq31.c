@@ -34,20 +34,20 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_mac_iq31(const msp_mac_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *result)
 {
     uint16_t length;
     msp_status status;
-    MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
+    MSP_LEA_MACLONG_PARAMS *leaParams;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter with the vector length. */
     length = params->length;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(srcA, 4) &
           MSP_LEA_VALID_ADDRESS(srcB, 4) &
-          MSP_LEA_VALID_ADDRESS(dst, 4))) {
+          MSP_LEA_VALID_ADDRESS(result, 4))) {
         return MSP_LEA_INVALID_ADDRESS;
     }
 
@@ -62,30 +62,45 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
         msp_lea_init();
     }
         
-    /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+    /* Allocate MSP_LEA_MACLONG_PARAMS structure. */
+    leaParams = (MSP_LEA_MACLONG_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MACLONG_PARAMS)/sizeof(uint32_t));
 
-    /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
+    /* Set MSP_LEA_MACLONG_PARAMS structure. */
     leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(srcB);
-    leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(result);
     leaParams->vectorSize = length;
     leaParams->input1Offset = 1;
     leaParams->input2Offset = 1;
-    leaParams->outputOffset = 1;
 
     /* Load source arguments to LEA. */
     LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(srcA);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
-    /* Invoke the LEACMD__ADDLONGMATRIX command with interrupts enabled. */
-    LEAPMCB = LEACMD__ADDLONGMATRIX | LEAITFLG1;
+#if (MSP_LEA_REVISION == MSP_LEA_REVISION_A)
+    /* Load function into code memory */
+    uint16_t cmdId = msp_lea_loadCommand(LEACMD__MACLONGMATRIX, MSP_LEA_MACLONGMATRIX,
+            sizeof(MSP_LEA_MACLONGMATRIX)/sizeof(MSP_LEA_MACLONGMATRIX[0]));
+
+#ifndef MSP_DISABLE_DIAGNOSTICS
+    /* Check the correct revision is defined and the command was loaded. */
+    if (cmdId == 0xffff) {
+        return MSP_LEA_INCORRECT_REVISION;
+    }
+#endif //MSP_DISABLE_DIAGNOSTICS
+
+    /* Invoke the patched command with interrupts enabled. */
+    LEAPMCB = cmdId | LEAITFLG1;
+#else //MSP_LEA_REVISION
+    /* Invoke the LEACMD__MACLONGMATRIX command with interrupts enabled. */
+    LEAPMCB = LEACMD__MACLONGMATRIX | LEAITFLG1;
+#endif //MSP_LEA_REVISION
 
     /* Clear DSPLib flags and enter LPM0. */
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
 
-    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+    /* Free MSP_LEA_MACLONG_PARAMS structure. */
+    msp_lea_freeMemory(sizeof(MSP_LEA_MACLONG_PARAMS)/sizeof(uint32_t));
     
     /* Set status flag. */
     status = MSP_SUCCESS;
@@ -107,21 +122,35 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     msp_lea_freeLock();
     return status;
 }
-    
-#else //MSP_USE_LEA
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+#else //MSP_USE_LEA    
+    
+msp_status msp_mac_iq31(const msp_mac_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *result)
 {
     uint16_t length;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter with the vector length. */
     length = params->length;
+
+    /* Initialize the result. */
+    *result = 0;
+    
+#if defined(__MSP430_HAS_MPY32__)
+    /* If MPY32 is available save control context and set to fractional mode. */
+    uint16_t ui16MPYState = MPY32CTL0;
+    MPY32CTL0 = MPYFRAC | MPYDLYWRTEN | MPYSAT;
+#endif //__MSP430_HAS_MPY32__
     
     /* Loop through all vector elements. */
     while (length--) {
-        /* Add srcA and srcB with saturation and store result. */
-        *dst++ = __saturated_add_iq31(*srcA++, *srcB++);
+        /* Multiply srcA and srcB and accumulate to the result. */
+        *result += __q31mpy(*srcA++,*srcB++);
     }
+    
+#if defined(__MSP430_HAS_MPY32__)
+    /* Restore MPY32 control context. */
+    MPY32CTL0 = ui16MPYState;
+#endif //__MSP430_HAS_MPY32__
 
     return MSP_SUCCESS;
 }

@@ -34,7 +34,7 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_cmplx_conj_iq31(const msp_cmplx_conj_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
     msp_status status;
@@ -45,9 +45,7 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that the data arrays are aligned and in a valid memory segment. */
-    if (!(MSP_LEA_VALID_ADDRESS(srcA, 4) &
-          MSP_LEA_VALID_ADDRESS(srcB, 4) &
-          MSP_LEA_VALID_ADDRESS(dst, 4))) {
+    if (!(MSP_LEA_VALID_ADDRESS(src, 4) && MSP_LEA_VALID_ADDRESS(dst, 4))) {
         return MSP_LEA_INVALID_ADDRESS;
     }
 
@@ -66,19 +64,50 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
 
     /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(srcB);
-    leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
+    leaParams->input2 = MSP_LEA_CONST_ZERO;
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(&CMPLX_REAL(dst));
     leaParams->vectorSize = length;
-    leaParams->input1Offset = 1;
-    leaParams->input2Offset = 1;
-    leaParams->outputOffset = 1;
+    leaParams->input1Offset = 2;
+    leaParams->input2Offset = 0;
+    leaParams->outputOffset = 2;
 
     /* Load source arguments to LEA. */
-    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(srcA);
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(&CMPLX_REAL(src));
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
     /* Invoke the LEACMD__ADDLONGMATRIX command with interrupts enabled. */
     LEAPMCB = LEACMD__ADDLONGMATRIX | LEAITFLG1;
+
+    /* Clear DSPLib flags and enter LPM0. */
+    msp_lea_ifg = 0;
+    msp_lea_enterLPM();
+
+    /* Reset source 2 and dst pointers. */
+    leaParams->input2 = MSP_LEA_IQ31_CONST_NEG_ONE;
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(&CMPLX_IMAG(dst));
+
+    /* Load source arguments to LEA. */
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(&CMPLX_IMAG(src));
+    LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
+
+#if (MSP_LEA_REVISION == MSP_LEA_REVISION_A)
+    /* Load function into code memory */
+    uint16_t cmdId = msp_lea_loadCommand(LEACMD__MPYLONGMATRIX, MSP_LEA_MPYLONGMATRIX,
+            sizeof(MSP_LEA_MPYLONGMATRIX)/sizeof(MSP_LEA_MPYLONGMATRIX[0]));
+
+#ifndef MSP_DISABLE_DIAGNOSTICS
+    /* Check the correct revision is defined and the command was loaded. */
+    if (cmdId == 0xffff) {
+        return MSP_LEA_INCORRECT_REVISION;
+    }
+#endif //MSP_DISABLE_DIAGNOSTICS
+
+    /* Invoke the patched command with interrupts enabled. */
+    LEAPMCB = cmdId | LEAITFLG1;
+#else //MSP_LEA_REVISION
+    /* Invoke the LEACMD__MPYLONGMATRIX command with interrupts enabled. */
+    LEAPMCB = LEACMD__MPYLONGMATRIX | LEAITFLG1;
+#endif //MSP_LEA_REVISION
 
     /* Clear DSPLib flags and enter LPM0. */
     msp_lea_ifg = 0;
@@ -101,16 +130,16 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     else if (msp_lea_ifg & LEASDIIFG) {
         status = MSP_LEA_SCALAR_INCONSISTENCY;
     }
-#endif
+#endif //MSP_DISABLE_DIAGNOSTICS
 
     /* Free lock for LEA module and return status. */
     msp_lea_freeLock();
     return status;
 }
-    
+
 #else //MSP_USE_LEA
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_cmplx_conj_iq31(const msp_cmplx_conj_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
     
@@ -119,8 +148,9 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     
     /* Loop through all vector elements. */
     while (length--) {
-        /* Add srcA and srcB with saturation and store result. */
-        *dst++ = __saturated_add_iq31(*srcA++, *srcB++);
+        /* Take the complex conjugate of src and store to dst. */
+        *dst++ = *src++;    // real
+        *dst++ = -*src++;   // imaginary
     }
 
     return MSP_SUCCESS;

@@ -32,81 +32,22 @@
 
 #include "../../include/DSPLib.h"
 
-/*
- * Optimized helper function for right shift operations with LEA.
- */    
-static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift);
-
-/*
- * Perform element wise left or right shift of a single source vector.
- */
-msp_status msp_shift_iq31(const msp_shift_iq31_params *params, const _iq31 *src, _iq31 *dst)
-{
-    int8_t shift;               // Shift count
-    uint16_t length;            // Shift length
-    
-    /* Initialize the loop counter and shift variables. */
-    length = params->length;
-    shift = params->shift;
-
-#ifndef MSP_DISABLE_DIAGNOSTICS
-    /* Verify the shift parameter. */
-    if ((shift > 31) || (shift < -31)) {
-        return MSP_SHIFT_SIZE_ERROR;
-    }
-#endif //MSP_DISABLE_DIAGNOSTICS
-
-    /* Shift src array left for a positive shift parameter. */
-    if (shift > 0) {  
-        /* Loop through all vector elements. */
-        while (length--) {
-            /* Shift src left by the shift parameter and store to dst. */
-            *dst++ = *src++ << shift;
-        }
-    }
-    /* Shift src array right for a negative shift parameter. */
-    else {
-        /* Use optimized helper function. */
-        return msp_shift_right_iq31(src, dst, length, -shift);
-    }
-    
-    return MSP_SUCCESS;
-}
-
 #if defined(MSP_USE_LEA)
 
-/* Shift factor lookup table. */
-const uint32_t msp_shift_right_factor_iq31[32] = {
-    0x80000000, 0x40000000, 0x20000000, 0x10000000, 
-    0x08000000, 0x04000000, 0x02000000, 0x01000000, 
-    0x00800000, 0x00400000, 0x00200000, 0x00100000, 
-    0x00080000, 0x00040000, 0x00020000, 0x00010000, 
-    0x00008000, 0x00004000, 0x00002000, 0x00001000, 
-    0x00000800, 0x00000400, 0x00000200, 0x00000100, 
-    0x00000080, 0x00000040, 0x00000020, 0x00000010, 
-    0x00000008, 0x00000004, 0x00000002, 0x00000001
-};
-    
-static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift)
+msp_status msp_cmplx_mpy_real_iq31(const msp_cmplx_mpy_real_iq31_params *params, const _iq31 *srcCmplx, const _iq31 *srcReal, _iq31 *dst)
 {
-    int32_t shiftValue;
-    int32_t *shiftVector;
+    uint16_t length;
     msp_status status;
     MSP_LEA_MPYLONGMATRIX_PARAMS *leaParams;
     
-    /* If shift is zero and source and data are not the same array copy data. */
-    if ((shift == 0) && (src != dst)) {
-        msp_copy_iq31_params copyParams;
-        copyParams.length = length;
-        return msp_copy_iq31(&copyParams, src, dst);
-    }
-    
-    /* Lookup the fractional shift value. */
-    shiftValue = msp_shift_right_factor_iq31[shift & 0x1f];
+    /* Initialize the loop counter with the vector length. */
+    length = params->length;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check that the data arrays are aligned and in a valid memory segment. */
-    if (!(MSP_LEA_VALID_ADDRESS(src, 4) && MSP_LEA_VALID_ADDRESS(dst, 4))) {
+    if (!(MSP_LEA_VALID_ADDRESS(srcCmplx, 4) &
+          MSP_LEA_VALID_ADDRESS(srcReal, 4) &
+          MSP_LEA_VALID_ADDRESS(dst, 4))) {
         return MSP_LEA_INVALID_ADDRESS;
     }
 
@@ -123,21 +64,17 @@ static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint
         
     /* Allocate MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_MPYLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
-        
-    /* Allocate offset vector of length one. */
-    shiftVector = (int32_t *)msp_lea_allocMemory(sizeof(int32_t)/sizeof(uint32_t));
-    shiftVector[0] = shiftValue;
 
     /* Set MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
-    leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(shiftVector);
+    leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(srcReal);
     leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
     leaParams->vectorSize = length;
-    leaParams->input1Offset = 1;
-    leaParams->input2Offset = 0;
-    leaParams->outputOffset = 1;
+    leaParams->input1Offset = 2;
+    leaParams->input2Offset = 1;
+    leaParams->outputOffset = 2;
 
     /* Load source arguments to LEA. */
-    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(srcCmplx);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
 #if (MSP_LEA_REVISION == MSP_LEA_REVISION_A)
@@ -163,8 +100,26 @@ static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
 
-    /* Free MSP_LEA_MPYLONGMATRIX_PARAMS structure and shift vector. */
-    msp_lea_freeMemory(sizeof(int32_t)/sizeof(uint32_t));
+    /* Reset MSP_LEA_MPYLONGMATRIX_PARAMS source 2 and dst pointers. */
+    leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(srcReal);
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(&dst[1]);
+
+    /* Load first source argument to LEA. */
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(&srcCmplx[1]);
+
+#if (MSP_LEA_REVISION == MSP_LEA_REVISION_A)
+    /* Invoke the patched command with interrupts enabled. */
+    LEAPMCB = cmdId | LEAITFLG1;
+#else //MSP_LEA_REVISION
+    /* Invoke the LEACMD__MPYLONGMATRIX command with interrupts enabled. */
+    LEAPMCB = LEACMD__MPYLONGMATRIX | LEAITFLG1;
+#endif //MSP_LEA_REVISION
+
+    /* Clear DSPLib flags and enter LPM0. */
+    msp_lea_ifg = 0;
+    msp_lea_enterLPM();
+
+    /* Free MSP_LEA_MPYLONGMATRIX_PARAMS structure. */
     msp_lea_freeMemory(sizeof(MSP_LEA_MPYLONGMATRIX_PARAMS)/sizeof(uint32_t));
     
     /* Set status flag. */
@@ -190,13 +145,51 @@ static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint
 
 #else //MSP_USE_LEA
     
-static inline msp_status msp_shift_right_iq31(const _iq31 *src, _iq31 *dst, uint16_t length, uint8_t shift)
-{    
+msp_status msp_cmplx_mpy_real_iq31(const msp_cmplx_mpy_real_iq31_params *params, const _iq31 *srcCmplx, const _iq31 *srcReal, _iq31 *dst)
+{
+    uint16_t length;
+    
+    /* Initialize the loop counter with the vector length. */
+    length = params->length;
+
+#if defined(__MSP430_HAS_MPY32__)
+    uint16_t *dstPtr = (uint16_t *)dst;
+    
+    /* If MPY32 is available save control context and set to fractional mode. */
+    uint16_t ui16MPYState = MPY32CTL0;
+    MPY32CTL0 = MPYFRAC | MPYDLYWRTEN;
+    
     /* Loop through all vector elements. */
     while (length--) {
-        /* Shift src right and store to dst. */
-        *dst++ = *src++ >> shift;
+        /* Multiply CMPLX_REAL(srcA) and CMPLX_REAL(srcB) */
+        MPYS32L = (uint16_t)CMPLX_REAL(srcReal);
+        MPYS32H = (uint16_t)(CMPLX_REAL(srcReal) >> 16);
+        OP2L    = (uint16_t)CMPLX_REAL(srcCmplx);
+        OP2H    = (uint16_t)(CMPLX_REAL(srcCmplx) >> 16);
+        *dstPtr++ = RES2;
+        *dstPtr++ = RES3;
+
+        /* Multiply CMPLX_IMAG(srcA) and CMPLX_REAL(srcB) */
+        OP2L = (uint16_t)CMPLX_IMAG(srcCmplx);
+        OP2H = (uint16_t)(CMPLX_IMAG(srcCmplx) >> 16);
+        *dstPtr++ = RES2;
+        *dstPtr++ = RES3;
+        
+        /* Increment pointers. */
+        srcReal++;
+        srcCmplx += CMPLX_INCREMENT;
     }
+    
+    /* Restore MPY32 control context. */
+    MPY32CTL0 = ui16MPYState;
+#else //__MSP430_HAS_MPY32__
+    /* Loop through all vector elements. */
+    while (length--) {
+        /* Multiply srcCmplx and srcReal and store to dst. */
+        *dst++ = __q31mpy(*srcCmplx++, *srcReal);   // real
+        *dst++ = __q31mpy(*srcCmplx++, *srcReal++); // imaginary
+    }
+#endif //__MSP430_HAS_MPY32__
 
     return MSP_SUCCESS;
 }

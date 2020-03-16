@@ -34,16 +34,21 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_mpy_q15(const msp_mpy_q15_params *params, const _q15 *srcA, const _q15 *srcB, _q15 *dst)
 {
     uint16_t length;
     msp_status status;
-    MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
+    MSP_LEA_MPYMATRIX_PARAMS *leaParams;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter with the vector length. */
     length = params->length;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
+    /* Check that length parameter is a multiple of two. */
+    if (length & 1) {
+        return MSP_SIZE_ERROR;
+    }
+    
     /* Check that the data arrays are aligned and in a valid memory segment. */
     if (!(MSP_LEA_VALID_ADDRESS(srcA, 4) &
           MSP_LEA_VALID_ADDRESS(srcB, 4) &
@@ -62,10 +67,10 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
         msp_lea_init();
     }
         
-    /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+    /* Allocate MSP_LEA_MPYMATRIX_PARAMS structure. */
+    leaParams = (MSP_LEA_MPYMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MPYMATRIX_PARAMS)/sizeof(uint32_t));
 
-    /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
+    /* Set MSP_LEA_MPYMATRIX_PARAMS structure. */
     leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(srcB);
     leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
     leaParams->vectorSize = length;
@@ -77,15 +82,15 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(srcA);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
-    /* Invoke the LEACMD__ADDLONGMATRIX command with interrupts enabled. */
-    LEAPMCB = LEACMD__ADDLONGMATRIX | LEAITFLG1;
+    /* Invoke the LEACMD__MPYMATRIX command with interrupts enabled. */
+    LEAPMCB = LEACMD__MPYMATRIX | LEAITFLG1;
 
     /* Clear DSPLib flags and enter LPM0. */
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
 
-    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+    /* Free MSP_LEA_MPYMATRIX_PARAMS structure. */
+    msp_lea_freeMemory(sizeof(MSP_LEA_MPYMATRIX_PARAMS)/sizeof(uint32_t));
     
     /* Set status flag. */
     status = MSP_SUCCESS;
@@ -107,21 +112,45 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     msp_lea_freeLock();
     return status;
 }
-    
+
 #else //MSP_USE_LEA
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_mpy_q15(const msp_mpy_q15_params *params, const _q15 *srcA, const _q15 *srcB, _q15 *dst)
 {
     uint16_t length;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter with the vector length. */
     length = params->length;
+
+#ifndef MSP_DISABLE_DIAGNOSTICS
+    /* Check that length parameter is a multiple of two. */
+    if (length & 1) {
+        return MSP_SIZE_ERROR;
+    }
+#endif //MSP_DISABLE_DIAGNOSTICS
+
+#if defined(__MSP430_HAS_MPY32__)
+    /* If MPY32 is available save control context and set to fractional mode. */
+    uint16_t ui16MPYState = MPY32CTL0;
+    MPY32CTL0 = MPYFRAC | MPYDLYWRTEN;
     
     /* Loop through all vector elements. */
     while (length--) {
-        /* Add srcA and srcB with saturation and store result. */
-        *dst++ = __saturated_add_iq31(*srcA++, *srcB++);
+        /* Multiply srcA and srcB and store to dst. */
+        MPYS = *srcA++;
+        OP2  = *srcB++;
+        *dst++ = RESHI;
     }
+    
+    /* Restore MPY32 control context. */
+    MPY32CTL0 = ui16MPYState;
+#else //__MSP430_HAS_MPY32__
+    /* Loop through all vector elements. */
+    while (length--) {
+        /* Multiply srcA and srcB and store to dst. */
+        *dst++ = __q15mpy(*srcA++, *srcB++);
+    }
+#endif //__MSP430_HAS_MPY32__
 
     return MSP_SUCCESS;
 }

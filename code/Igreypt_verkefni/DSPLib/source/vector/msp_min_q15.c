@@ -34,20 +34,24 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_min_q15(const msp_min_q15_params *params, const _q15 *src, _q15 *min, uint16_t *index)
 {
     uint16_t length;
+    int16_t *output;
     msp_status status;
-    MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
+    MSP_LEA_MIN_PARAMS *leaParams;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter with the vector length. */
     length = params->length;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
+    /* Check that length parameter is a multiple of two. */
+    if (length & 1) {
+        return MSP_SIZE_ERROR;
+    }
+
     /* Check that the data arrays are aligned and in a valid memory segment. */
-    if (!(MSP_LEA_VALID_ADDRESS(srcA, 4) &
-          MSP_LEA_VALID_ADDRESS(srcB, 4) &
-          MSP_LEA_VALID_ADDRESS(dst, 4))) {
+    if (!(MSP_LEA_VALID_ADDRESS(src, 4))) {
         return MSP_LEA_INVALID_ADDRESS;
     }
 
@@ -61,31 +65,51 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
-        
-    /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
 
-    /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams->input2 = MSP_LEA_CONVERT_ADDRESS(srcB);
-    leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
+    /* Allocate MSP_LEA_MIN_PARAMS structure. */
+    leaParams = (MSP_LEA_MIN_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_MIN_PARAMS)/sizeof(uint32_t));
+
+    /* Allocate output vector of length two. */
+    output = (int16_t *)msp_lea_allocMemory(2*sizeof(int16_t)/sizeof(uint32_t));
+
+    /* Set MSP_LEA_MIN_PARAMS structure. */
     leaParams->vectorSize = length;
-    leaParams->input1Offset = 1;
-    leaParams->input2Offset = 1;
-    leaParams->outputOffset = 1;
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(output);
 
     /* Load source arguments to LEA. */
-    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(srcA);
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
-    /* Invoke the LEACMD__ADDLONGMATRIX command with interrupts enabled. */
-    LEAPMCB = LEACMD__ADDLONGMATRIX | LEAITFLG1;
+#if (MSP_LEA_REVISION == MSP_LEA_REVISION_A)
+    /* Load function into code memory */
+    uint16_t cmdId = msp_lea_loadCommand(LEACMD__MIN, MSP_LEA_MIN,
+            sizeof(MSP_LEA_MIN)/sizeof(MSP_LEA_MIN[0]));
+
+#ifndef MSP_DISABLE_DIAGNOSTICS
+    /* Check the correct revision is defined and the command was loaded. */
+    if (cmdId == 0xffff) {
+        return MSP_LEA_INCORRECT_REVISION;
+    }
+#endif //MSP_DISABLE_DIAGNOSTICS
+
+    /* Invoke the patched command with interrupts enabled. */
+    LEAPMCB = cmdId | LEAITFLG1;
+#else //MSP_LEA_REVISION
+    /* Invoke the LEACMD__MIN command with interrupts enabled. */
+    LEAPMCB = LEACMD__MIN | LEAITFLG1;
+#endif //MSP_LEA_REVISION
 
     /* Clear DSPLib flags and enter LPM0. */
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
+    
+    /* Write results. */
+    *min = output[0];
+    *index = output[1];
 
-    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+    /* Free MSP_LEA_MIN_PARAMS structure and output vector. */
+    msp_lea_freeMemory(2*sizeof(int16_t)/sizeof(uint32_t));
+    msp_lea_freeMemory(sizeof(MSP_LEA_MIN_PARAMS)/sizeof(uint32_t));
     
     /* Set status flag. */
     status = MSP_SUCCESS;
@@ -107,21 +131,46 @@ msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, co
     msp_lea_freeLock();
     return status;
 }
-    
+
 #else //MSP_USE_LEA
 
-msp_status msp_add_iq31(const msp_add_iq31_params *params, const _iq31 *srcA, const _iq31 *srcB, _iq31 *dst)
+msp_status msp_min_q15(const msp_min_q15_params *params, const _q15 *src, _q15 *min, uint16_t *index)
 {
+    uint16_t i;
+    _q15 temp;
+    _q15 minimum;
     uint16_t length;
     
-    /* Initialize the vector length. */
+    /* Initialize the loop counter with the vector length. */
     length = params->length;
+
+#ifndef MSP_DISABLE_DIAGNOSTICS
+    /* Check that length parameter is a multiple of two. */
+    if (length & 1) {
+        return MSP_SIZE_ERROR;
+    }
+#endif //MSP_DISABLE_DIAGNOSTICS
+    
+    /* Initialize the minimum value and index. */
+    minimum = INT16_MAX;
+    i = 0;
     
     /* Loop through all vector elements. */
     while (length--) {
-        /* Add srcA and srcB with saturation and store result. */
-        *dst++ = __saturated_add_iq31(*srcA++, *srcB++);
+        /* Store vector element to local variable. */
+        temp = *src++;
+        
+        /* Compare vector element with current minimum value. */
+        if (temp <= minimum) {
+            /* Update minimum value and index. */
+            minimum = temp;
+            i = length;
+        }
     }
+    
+    /* Save local minimum and index to output arguments. */
+    *min = minimum;
+    *index = params->length - (i + 1);
 
     return MSP_SUCCESS;
 }
