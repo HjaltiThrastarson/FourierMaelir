@@ -68,7 +68,6 @@ application/audio_playback.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DS
 application/audio_playback.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h
 application/audio_playback.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h
 application/audio_playback.obj: ../application/FFT.h
-application/audio_playback.obj: ../application/fir.h
 
 ../application/audio_playback.c: 
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/stdlib.h: 
@@ -138,4 +137,3 @@ C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_filter.h:
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h: 
 ../application/FFT.h: 
-../application/fir.h: 
