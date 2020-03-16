@@ -1,3 +1,4 @@
+
 ################################################################################
 # Automatically-generated file. Do not edit!
 ################################################################################
@@ -5,6 +6,15 @@
 SHELL = cmd.exe
 
 # Add inputs and outputs from these tool invocations to the build variables 
+=======
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+SHELL = cmd.exe
+
+# Add inputs and outputs from these tool invocations to the build variables 
+
 C_SRCS += \
 ../driverlib/MSP430FR5xx_6xx/adc12_b.c \
 ../driverlib/MSP430FR5xx_6xx/aes256.c \
@@ -34,7 +44,12 @@ C_SRCS += \
 ../driverlib/MSP430FR5xx_6xx/timer_a.c \
 ../driverlib/MSP430FR5xx_6xx/timer_b.c \
 ../driverlib/MSP430FR5xx_6xx/tlv.c \
+
 ../driverlib/MSP430FR5xx_6xx/wdt_a.c 
+
+=======
+../driverlib/MSP430FR5xx_6xx/wdt_a.c 
+
 
 C_DEPS += \
 ./driverlib/MSP430FR5xx_6xx/adc12_b.d \
@@ -65,7 +80,12 @@ C_DEPS += \
 ./driverlib/MSP430FR5xx_6xx/timer_a.d \
 ./driverlib/MSP430FR5xx_6xx/timer_b.d \
 ./driverlib/MSP430FR5xx_6xx/tlv.d \
+
 ./driverlib/MSP430FR5xx_6xx/wdt_a.d 
+
+=======
+./driverlib/MSP430FR5xx_6xx/wdt_a.d 
+
 
 OBJS += \
 ./driverlib/MSP430FR5xx_6xx/adc12_b.obj \
@@ -96,7 +116,12 @@ OBJS += \
 ./driverlib/MSP430FR5xx_6xx/timer_a.obj \
 ./driverlib/MSP430FR5xx_6xx/timer_b.obj \
 ./driverlib/MSP430FR5xx_6xx/tlv.obj \
+
 ./driverlib/MSP430FR5xx_6xx/wdt_a.obj 
+
+=======
+./driverlib/MSP430FR5xx_6xx/wdt_a.obj 
+
 
 OBJS__QUOTED += \
 "driverlib\MSP430FR5xx_6xx\adc12_b.obj" \
@@ -127,6 +152,10 @@ OBJS__QUOTED += \
 "driverlib\MSP430FR5xx_6xx\timer_a.obj" \
 "driverlib\MSP430FR5xx_6xx\timer_b.obj" \
 "driverlib\MSP430FR5xx_6xx\tlv.obj" \
+
+"driverlib\MSP430FR5xx_6xx\wdt_a.obj" 
+
+=======
 "driverlib\MSP430FR5xx_6xx\wdt_a.obj" 
 
 C_DEPS__QUOTED += \
@@ -158,7 +187,12 @@ C_DEPS__QUOTED += \
 "driverlib\MSP430FR5xx_6xx\timer_a.d" \
 "driverlib\MSP430FR5xx_6xx\timer_b.d" \
 "driverlib\MSP430FR5xx_6xx\tlv.d" \
+
 "driverlib\MSP430FR5xx_6xx\wdt_a.d" 
+
+=======
+"driverlib\MSP430FR5xx_6xx\wdt_a.d" 
+
 
 C_SRCS__QUOTED += \
 "../driverlib/MSP430FR5xx_6xx/adc12_b.c" \
@@ -189,6 +223,10 @@ C_SRCS__QUOTED += \
 "../driverlib/MSP430FR5xx_6xx/timer_a.c" \
 "../driverlib/MSP430FR5xx_6xx/timer_b.c" \
 "../driverlib/MSP430FR5xx_6xx/tlv.c" \
+
 "../driverlib/MSP430FR5xx_6xx/wdt_a.c" 
 
+
+=======
+"../driverlib/MSP430FR5xx_6xx/wdt_a.c" 
 
