@@ -34,15 +34,16 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _iq31 *src, _iq31 *dst)
+msp_status msp_interleave_q15(const msp_interleave_q15_params *params, const _q15 *src, _q15 *dst)
 {
+    uint16_t cmdId;
     uint16_t length;
     uint16_t channel;
     uint16_t numChannels;
     msp_status status;
-    MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
+    MSP_LEA_INTERLEAVE_PARAMS *leaParams;
 
-    /* Initialize the vector length. */
+    /* Initialize local variables from parameters. */
     length = params->length;
     channel = params->channel;
     numChannels = params->numChannels;
@@ -70,34 +71,65 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
         msp_lea_init();
     }
         
-    /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+    /* Allocate MSP_LEA_INTERLEAVE_PARAMS structure. */
+    leaParams = (MSP_LEA_INTERLEAVE_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_INTERLEAVE_PARAMS)/sizeof(uint32_t));
 
-    /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams->input2 = MSP_LEA_CONST_ZERO;
-    leaParams->output = MSP_LEA_CONVERT_ADDRESS(&dst[channel]);
+    /* Set MSP_LEA_INTERLEAVE_PARAMS structure. */
     leaParams->vectorSize = length;
-    leaParams->input1Offset = 1;
-    leaParams->input2Offset = 0;
-    leaParams->outputOffset = numChannels;
+    leaParams->channel = channel;
+    leaParams->numChannels = numChannels;
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
 
     /* Load source arguments to LEA. */
     LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
-    /* Invoke the LEACMD__ADDMATRIXLONG command with interrupts enabled. */
-    LEAPMCB = LEACMD__ADDLONGMATRIX | LEAITFLG1;
+    /* Determine which LEA deinterleave command to invoke. */
+    if (channel & 1) {
+        if (numChannels & 1) {
+            /* Load the LEACMD__INTERLEAVEODDODD command into code memory. */
+            cmdId = msp_lea_loadCommand(LEACMD__INTERLEAVEODDODD,MSP_LEA_INTERLEAVEODDODD,
+                    sizeof(MSP_LEA_INTERLEAVEODDODD)/sizeof(MSP_LEA_INTERLEAVEODDODD[0]));
+        }
+        else {
+            /* Load the LEACMD__INTERLEAVEODDEVEN command into code memory. */
+            cmdId = msp_lea_loadCommand(LEACMD__INTERLEAVEODDEVEN,MSP_LEA_INTERLEAVEODDEVEN,
+                    sizeof(MSP_LEA_INTERLEAVEODDEVEN)/sizeof(MSP_LEA_INTERLEAVEODDEVEN[0]));
+        }
+    }
+    else {
+        if (numChannels & 1) {
+            /* Load the LEACMD__INTERLEAVEEVENODD command into code memory. */
+            cmdId = msp_lea_loadCommand(LEACMD__INTERLEAVEEVENODD,MSP_LEA_INTERLEAVEEVENODD,
+                    sizeof(MSP_LEA_INTERLEAVEEVENODD)/sizeof(MSP_LEA_INTERLEAVEEVENODD[0]));
+        }
+        else {
+            /* Load the LEACMD__INTERLEAVEEVENEVEN command into code memory. */
+            cmdId = msp_lea_loadCommand(LEACMD__INTERLEAVEEVENEVEN,MSP_LEA_INTERLEAVEEVENEVEN,
+                    sizeof(MSP_LEA_INTERLEAVEEVENEVEN)/sizeof(MSP_LEA_INTERLEAVEEVENEVEN[0]));
+        }
+    }
+
+#ifndef MSP_DISABLE_DIAGNOSTICS
+    /* Check the correct revision is defined and the command was loaded. */
+    if (cmdId == 0xffff) {
+        return MSP_LEA_INCORRECT_REVISION;
+    }
+#endif //MSP_DISABLE_DIAGNOSTICS
+
+    /* Invoke the loaded command with interrupts enabled. */
+    LEAPMCB = cmdId | LEAITFLG1;
 
     /* Clear DSPLib flags, restore interrupts and enter LPM0. */
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
 
-    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
-    
+    /* Free MSP_LEA_INTERLEAVE_PARAMS structure. */
+    msp_lea_freeMemory(sizeof(MSP_LEA_INTERLEAVE_PARAMS)/sizeof(uint32_t));
+
     /* Set status flag. */
     status = MSP_SUCCESS;
-        
+
 #ifndef MSP_DISABLE_DIAGNOSTICS
     /* Check LEA interrupt flags for any errors. */
     if (msp_lea_ifg & LEACOVLIFG) {
@@ -109,7 +141,7 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
     else if (msp_lea_ifg & LEASDIIFG) {
         status = MSP_LEA_SCALAR_INCONSISTENCY;
     }
-#endif
+#endif //MSP_DISABLE_DIAGNOSTICS
 
     /* Free lock for LEA module and return status. */
     msp_lea_freeLock();
@@ -118,7 +150,7 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
 
 #else //MSP_USE_LEA
 
-msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _iq31 *src, _iq31 *dst)
+msp_status msp_interleave_q15(const msp_interleave_q15_params *params, const _q15 *src, _q15 *dst)
 {
     uint16_t length;
     uint16_t channel;

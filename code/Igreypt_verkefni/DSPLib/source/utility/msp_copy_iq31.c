@@ -34,28 +34,18 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _iq31 *src, _iq31 *dst)
+msp_status msp_copy_iq31(const msp_copy_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
-    uint16_t channel;
-    uint16_t numChannels;
     msp_status status;
     MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
 
     /* Initialize the vector length. */
     length = params->length;
-    channel = params->channel;
-    numChannels = params->numChannels;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
-    /* Check that the channel is less than the total number of channels. */
-    if (channel > numChannels) {
-        return MSP_SIZE_ERROR;
-    }
-    
-    /* Check that the data arrays are aligned and in a valid memory segment. */
-    if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
-          MSP_LEA_VALID_ADDRESS(dst, 4))) {
+    /* Check that the data array is aligned and in a valid memory segment. */
+    if (!MSP_LEA_VALID_ADDRESS(dst, 4)) {
         return MSP_LEA_INVALID_ADDRESS;
     }
 
@@ -75,11 +65,11 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
 
     /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     leaParams->input2 = MSP_LEA_CONST_ZERO;
-    leaParams->output = MSP_LEA_CONVERT_ADDRESS(&dst[channel]);
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
     leaParams->vectorSize = length;
     leaParams->input1Offset = 1;
     leaParams->input2Offset = 0;
-    leaParams->outputOffset = numChannels;
+    leaParams->outputOffset = 1;
 
     /* Load source arguments to LEA. */
     LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
@@ -118,29 +108,15 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
 
 #else //MSP_USE_LEA
 
-msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _iq31 *src, _iq31 *dst)
+msp_status msp_copy_iq31(const msp_copy_iq31_params *params, const _iq31 *src, _iq31 *dst)
 {
     uint16_t length;
-    uint16_t channel;
-    uint16_t numChannels;
 
-    /* Initialize local variables from parameters. */
+    /* Initialize the vector length. */
     length = params->length;
-    channel = params->channel;
-    numChannels = params->numChannels;
-
-#ifndef MSP_DISABLE_DIAGNOSTICS
-    /* Check that the channel is less than the total number of channels. */
-    if (channel > numChannels) {
-        return MSP_SIZE_ERROR;
-    }
-#endif //MSP_DISABLE_DIAGNOSTICS
-
-    /* Insert the requested channel into the destination data. */
-    dst += channel;
-    while (length--) {
-        *dst = *src++;
-        dst += numChannels;
+    
+    while(length--) {
+        *dst++ = *src++;
     }
 
     return MSP_SUCCESS;

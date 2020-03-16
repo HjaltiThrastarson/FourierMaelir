@@ -34,28 +34,24 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _iq31 *src, _iq31 *dst)
+msp_status msp_cmplx_bitrev_q15(const msp_cmplx_bitrev_q15_params *params, _q15 *src)
 {
-    uint16_t length;
-    uint16_t channel;
-    uint16_t numChannels;
     msp_status status;
-    MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
-
-    /* Initialize the vector length. */
+    uint16_t length;
+    uint16_t sqrtLength;
+    MSP_LEA_BITREVERSECOMPLEX_PARAMS *leaParams;
+    
+    /* Save input length to local. */
     length = params->length;
-    channel = params->channel;
-    numChannels = params->numChannels;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
-    /* Check that the channel is less than the total number of channels. */
-    if (channel > numChannels) {
+    /* Check that the length is a power of two. */
+    if ((length & (length-1))) {
         return MSP_SIZE_ERROR;
     }
     
     /* Check that the data arrays are aligned and in a valid memory segment. */
-    if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
-          MSP_LEA_VALID_ADDRESS(dst, 4))) {
+    if (!(MSP_LEA_VALID_ADDRESS(src, 4))) {
         return MSP_LEA_INVALID_ADDRESS;
     }
 
@@ -69,31 +65,38 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
     if (!(LEAPMCTL & LEACMDEN)) {
         msp_lea_init();
     }
+    
+    /* Check vector size to determine which bit reverse function to use. */
+    sqrtLength = 1;
+    while (length > 2) {
+        sqrtLength <<= 1;
+        length >>= 2;
+    }
         
-    /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
-
-    /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    leaParams->input2 = MSP_LEA_CONST_ZERO;
-    leaParams->output = MSP_LEA_CONVERT_ADDRESS(&dst[channel]);
-    leaParams->vectorSize = length;
-    leaParams->input1Offset = 1;
-    leaParams->input2Offset = 0;
-    leaParams->outputOffset = numChannels;
-
-    /* Load source arguments to LEA. */
+    /* Allocate MSP_LEA_BITREVERSECOMPLEX_PARAMS structure. */
+    leaParams = (MSP_LEA_BITREVERSECOMPLEX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_BITREVERSECOMPLEX_PARAMS)/sizeof(uint32_t));
+    
+    /* Initialize MSP_LEA_BITREVERSECOMPLEX_PARAMS structure. */
+    leaParams->sqrtVectorSize = sqrtLength;
     LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
-
-    /* Invoke the LEACMD__ADDMATRIXLONG command with interrupts enabled. */
-    LEAPMCB = LEACMD__ADDLONGMATRIX | LEAITFLG1;
+    
+    /* Check if remainder is even or odd to determine which LEA function to use. */
+    if (length == 2) {
+        /* Invoke the LEACMD__BITREVERSECOMPLEXODD command with interrupts enabled. */
+        LEAPMCB = LEACMD__BITREVERSECOMPLEXODD | LEAITFLG1;
+    }
+    else {
+        /* Invoke the LEACMD__BITREVERSECOMPLEXEVEN command with interrupts enabled. */
+        LEAPMCB = LEACMD__BITREVERSECOMPLEXEVEN | LEAITFLG1;
+    }
 
     /* Clear DSPLib flags, restore interrupts and enter LPM0. */
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
 
-    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
-    msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+    /* Free MSP_LEA_BITREVERSECOMPLEX_PARAMS structure. */
+    msp_lea_freeMemory(sizeof(MSP_LEA_BITREVERSECOMPLEX_PARAMS)/sizeof(uint32_t));
     
     /* Set status flag. */
     status = MSP_SUCCESS;
@@ -118,31 +121,54 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
 
 #else //MSP_USE_LEA
 
-msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _iq31 *src, _iq31 *dst)
+/*
+ * Perform an in-place bit reversal of the complex input array using a lookup
+ * table.
+ */
+msp_status msp_cmplx_bitrev_q15(const msp_cmplx_bitrev_q15_params *params, _q15 *src)
 {
-    uint16_t length;
-    uint16_t channel;
-    uint16_t numChannels;
-
-    /* Initialize local variables from parameters. */
+    uint16_t i;                     // loop counter
+    uint16_t index;                 // left justified index
+    uint16_t indexInc;              // index increment
+    uint16_t length;                // src length
+    uint16_t indexBitRev;           // index bit reversal
+    uint32_t temp;                  // Temporary storage
+    uint32_t *srcPtr;               // Treat complex data pairs as 32-bit data
+    
+    /* Initialize source pointer and length. */
+    srcPtr = (uint32_t *)src;
     length = params->length;
-    channel = params->channel;
-    numChannels = params->numChannels;
-
+    index = 0;
+    indexInc = 2;
+    
+    /* Calculate index increment for left justified index. */
+    while (length < 0x8000) {
+        indexInc <<= 1;
+        length <<= 1;
+    }
+        
 #ifndef MSP_DISABLE_DIAGNOSTICS
-    /* Check that the channel is less than the total number of channels. */
-    if (channel > numChannels) {
+    /* Check that the length is a power of two. */
+    if (length != 0x8000) {
         return MSP_SIZE_ERROR;
     }
 #endif //MSP_DISABLE_DIAGNOSTICS
-
-    /* Insert the requested channel into the destination data. */
-    dst += channel;
-    while (length--) {
-        *dst = *src++;
-        dst += numChannels;
+    
+    /* In-place bit-reversal using fixed table length. */
+    length = params->length;
+    for (i = 0; i < length; i++, index += indexInc) {
+        /* Calculate bit reversed index. */
+        indexBitRev = ((uint16_t)msp_cmplx_bitrev_table_ui8[index & 0xff] << 8)
+            + ((uint16_t)msp_cmplx_bitrev_table_ui8[(index >> 8) & 0xff]);
+        
+        if (i < indexBitRev) {
+            /* Swap inputs. */
+            temp = srcPtr[i];
+            srcPtr[i] = srcPtr[indexBitRev];
+            srcPtr[indexBitRev] = temp;
+        }
     }
-
+    
     return MSP_SUCCESS;
 }
 

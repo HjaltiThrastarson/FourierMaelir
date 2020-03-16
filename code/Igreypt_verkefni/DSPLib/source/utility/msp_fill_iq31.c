@@ -34,28 +34,19 @@
 
 #if defined(MSP_USE_LEA)
 
-msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _iq31 *src, _iq31 *dst)
+msp_status msp_fill_iq31(const msp_fill_iq31_params *params, _iq31 *dst)
 {
     uint16_t length;
-    uint16_t channel;
-    uint16_t numChannels;
+    int32_t *fillVector;
     msp_status status;
     MSP_LEA_ADDLONGMATRIX_PARAMS *leaParams;
 
     /* Initialize the vector length. */
     length = params->length;
-    channel = params->channel;
-    numChannels = params->numChannels;
 
 #ifndef MSP_DISABLE_DIAGNOSTICS
-    /* Check that the channel is less than the total number of channels. */
-    if (channel > numChannels) {
-        return MSP_SIZE_ERROR;
-    }
-    
-    /* Check that the data arrays are aligned and in a valid memory segment. */
-    if (!(MSP_LEA_VALID_ADDRESS(src, 4) &
-          MSP_LEA_VALID_ADDRESS(dst, 4))) {
+    /* Check that the data array is aligned and in a valid memory segment. */
+    if (!MSP_LEA_VALID_ADDRESS(dst, 4)) {
         return MSP_LEA_INVALID_ADDRESS;
     }
 
@@ -72,17 +63,21 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
         
     /* Allocate MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     leaParams = (MSP_LEA_ADDLONGMATRIX_PARAMS *)msp_lea_allocMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
+        
+    /* Allocate fill vector of length one. */
+    fillVector = (int32_t *)msp_lea_allocMemory(sizeof(int32_t)/sizeof(uint32_t));
+    fillVector[0] = params->value;
 
     /* Set MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
     leaParams->input2 = MSP_LEA_CONST_ZERO;
-    leaParams->output = MSP_LEA_CONVERT_ADDRESS(&dst[channel]);
+    leaParams->output = MSP_LEA_CONVERT_ADDRESS(dst);
     leaParams->vectorSize = length;
-    leaParams->input1Offset = 1;
+    leaParams->input1Offset = 0;
     leaParams->input2Offset = 0;
-    leaParams->outputOffset = numChannels;
+    leaParams->outputOffset = 1;
 
     /* Load source arguments to LEA. */
-    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(src);
+    LEAPMS0 = MSP_LEA_CONVERT_ADDRESS(fillVector);
     LEAPMS1 = MSP_LEA_CONVERT_ADDRESS(leaParams);
 
     /* Invoke the LEACMD__ADDMATRIXLONG command with interrupts enabled. */
@@ -92,7 +87,8 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
     msp_lea_ifg = 0;
     msp_lea_enterLPM();
 
-    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure. */
+    /* Free MSP_LEA_ADDLONGMATRIX_PARAMS structure and fill vector. */
+    msp_lea_freeMemory(sizeof(fillVector)/sizeof(uint32_t));
     msp_lea_freeMemory(sizeof(MSP_LEA_ADDLONGMATRIX_PARAMS)/sizeof(uint32_t));
     
     /* Set status flag. */
@@ -118,29 +114,15 @@ msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _
 
 #else //MSP_USE_LEA
 
-msp_status msp_interleave_iq31(const msp_interleave_iq31_params *params, const _iq31 *src, _iq31 *dst)
+msp_status msp_fill_iq31(const msp_fill_iq31_params *params, _iq31 *dst)
 {
     uint16_t length;
-    uint16_t channel;
-    uint16_t numChannels;
 
-    /* Initialize local variables from parameters. */
+    /* Initialize the vector length. */
     length = params->length;
-    channel = params->channel;
-    numChannels = params->numChannels;
-
-#ifndef MSP_DISABLE_DIAGNOSTICS
-    /* Check that the channel is less than the total number of channels. */
-    if (channel > numChannels) {
-        return MSP_SIZE_ERROR;
-    }
-#endif //MSP_DISABLE_DIAGNOSTICS
-
-    /* Insert the requested channel into the destination data. */
-    dst += channel;
-    while (length--) {
-        *dst = *src++;
-        dst += numChannels;
+    
+    while(length--) {
+        *dst++ = params->value;
     }
 
     return MSP_SUCCESS;

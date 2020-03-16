@@ -37,7 +37,7 @@
  * conjugate, the complex DFT and complex scaling. Fixed scaling is performed
  * such that this is the direct inverse of the forward FFT.
  */
-msp_status msp_cmplx_ifft_iq31(const msp_cmplx_fft_iq31_params *params, int32_t *src)
+msp_status msp_ifft_iq31(const msp_fft_iq31_params *params, int32_t *src)
 {
     uint16_t index;                             // min/max index
     uint16_t length;                            // vector length
@@ -48,11 +48,12 @@ msp_status msp_cmplx_ifft_iq31(const msp_cmplx_fft_iq31_params *params, int32_t 
     msp_status status;                          // Status of the operations
     msp_max_iq31_params paramsMax;              // Maximum params
     msp_min_iq31_params paramsMin;              // Minimum params
+    msp_split_iq31_params paramsSplit;          // Split operation params
     msp_cmplx_fft_iq31_params paramsCmplxFFT;   // Complex FFT params
     msp_cmplx_shift_iq31_params paramsShift;    // Complex shift params
     
     /* Calculate the necessary result scale based on length. */
-    preShift = -1;
+    preShift = -2;
     length = params->length;
     while (length > 2) {
         preShift--;
@@ -60,30 +61,30 @@ msp_status msp_cmplx_ifft_iq31(const msp_cmplx_fft_iq31_params *params, int32_t 
     }
     
     /* Find maximum input to determine scaling order. */
-    paramsMax.length = params->length << 1;
+    paramsMax.length = params->length;
     status = msp_max_iq31(&paramsMax, src, &maximum, &index);
     if (status !=  MSP_SUCCESS) {
         return status;
     }
     
     /* Find minimum input to determine scaling order. */
-    paramsMin.length = params->length << 1;
+    paramsMin.length = params->length;
     status = msp_min_iq31(&paramsMin, src, &minimum, &index);
     if (status !=  MSP_SUCCESS) {
         return status;
     }
     
-    /* Determine scaling order based on min/max. */
+    /* Determine scaling order based on min/max results. */
     postShift = 0;
     minimum = minimum < -maximum ? minimum : -maximum;
-    while (minimum < (INT32_MIN/2)) {
+    while (minimum > (INT32_MIN/2)) {
         minimum <<= 1;
         preShift++;
         postShift--;
     }
     
     /* Prescale the complex fft input with complex conjugate. */
-    paramsShift.length = params->length;
+    paramsShift.length = params->length >> 1;
     paramsShift.shift = preShift;
     paramsShift.conjugate = true;
     status = msp_cmplx_shift_iq31(&paramsShift, src, src);
@@ -91,8 +92,18 @@ msp_status msp_cmplx_ifft_iq31(const msp_cmplx_fft_iq31_params *params, int32_t 
         return status;
     }
     
+    /* Initialize split operation params structure. */
+    paramsSplit.length = params->length;
+    paramsSplit.twiddleTable = params->twiddleTable;
+    
+    /* Perform the last stage split operation to obtain N/2 complex FFT results. */
+    status = msp_split_iq31(&paramsSplit, src);
+    if (status !=  MSP_SUCCESS) {
+        return status;
+    }
+
     /* Initialize complex FFT params structure. */
-    paramsCmplxFFT.length = params->length;
+    paramsCmplxFFT.length = params->length >> 1;
     paramsCmplxFFT.bitReverse = params->bitReverse;
     paramsCmplxFFT.twiddleTable = params->twiddleTable;
     
@@ -103,7 +114,7 @@ msp_status msp_cmplx_ifft_iq31(const msp_cmplx_fft_iq31_params *params, int32_t 
     }
     
     /* Initialize complex shift parameters with conjugate enabled. */
-    paramsShift.length = params->length;
+    paramsShift.length = params->length >> 1;
     paramsShift.shift = postShift;
     paramsShift.conjugate = true;
     return msp_cmplx_shift_iq31(&paramsShift, src, src);
