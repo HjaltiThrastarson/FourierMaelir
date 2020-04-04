@@ -69,6 +69,10 @@ application/application.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLi
 application/application.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h
 application/application.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h
 application/application.obj: ../application/FFT.h
+application/application.obj: ../application/fir.h
+application/application.obj: ../application/UART.h
+application/application.obj: C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/inttypes.h
+application/application.obj: C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/machine/_inttypes.h
 
 ../application/application.c: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/driverlib/MSP430FR5xx_6xx/driverlib.h: 
@@ -139,3 +143,7 @@ C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_filter.h:
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h: 
 ../application/FFT.h: 
+../application/fir.h: 
+../application/UART.h: 
+C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/inttypes.h: 
+C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/machine/_inttypes.h: 

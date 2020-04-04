@@ -10,6 +10,7 @@ ASM_SRCS += \
 
 C_SRCS += \
 ../application/FFT.c \
+../application/UART.c \
 ../application/application.c \
 ../application/audio_collect.c \
 ../application/audio_playback.c \
@@ -18,6 +19,7 @@ C_SRCS += \
 
 C_DEPS += \
 ./application/FFT.d \
+./application/UART.d \
 ./application/application.d \
 ./application/audio_collect.d \
 ./application/audio_playback.d \
@@ -27,6 +29,7 @@ C_DEPS += \
 OBJS += \
 ./application/FFT.obj \
 ./application/FFT_430.obj \
+./application/UART.obj \
 ./application/application.obj \
 ./application/audio_collect.obj \
 ./application/audio_playback.obj \
@@ -39,6 +42,7 @@ ASM_DEPS += \
 OBJS__QUOTED += \
 "application\FFT.obj" \
 "application\FFT_430.obj" \
+"application\UART.obj" \
 "application\application.obj" \
 "application\audio_collect.obj" \
 "application\audio_playback.obj" \
@@ -47,6 +51,7 @@ OBJS__QUOTED += \
 
 C_DEPS__QUOTED += \
 "application\FFT.d" \
+"application\UART.d" \
 "application\application.d" \
 "application\audio_collect.d" \
 "application\audio_playback.d" \
@@ -58,6 +63,7 @@ ASM_DEPS__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../application/FFT.c" \
+"../application/UART.c" \
 "../application/application.c" \
 "../application/audio_collect.c" \
 "../application/audio_playback.c" \

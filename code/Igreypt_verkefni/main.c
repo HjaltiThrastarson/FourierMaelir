@@ -75,6 +75,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "images.h"
+#include <string.h>
 #include "audio_collect.h"
 #include "audio_playback.h"
 #include "application.h"
@@ -99,10 +100,7 @@ Playback_configParams gPlaybackConfig;
 
 int main(void)
 {
-    uint16_t gie;
-
-    WDTCTL = WDTPW | WDTHOLD;       // Stop watchdog timer
-
+    uint16_t gie;    WDTCTL = WDTPW | WDTHOLD;       // Stop watchdog timer
     initClock();
     initGpio();
 

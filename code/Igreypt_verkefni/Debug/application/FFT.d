@@ -74,6 +74,8 @@ application/FFT.obj: ../application/audio_playback.h
 application/FFT.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/grlib/grlib.h
 application/FFT.obj: ../application/application.h
 application/FFT.obj: ../application/global.h
+application/FFT.obj: ../application/fir.h
+application/FFT.obj: ../application/UART.h
 
 ../application/FFT.c: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/driverlib/MSP430FR5xx_6xx/driverlib.h: 
@@ -149,3 +151,5 @@ C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h:
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/grlib/grlib.h: 
 ../application/application.h: 
 ../application/global.h: 
+../application/fir.h: 
+../application/UART.h: 

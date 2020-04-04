@@ -43,14 +43,14 @@
 #include "global.h"
 #include "DSPLib.h"
 #include "FFT.h"
+#include "fir.h"
+#include "UART.h"
 
 // Uncomment this to perform power benchmark without the audio boosterpack and
 // graphics LCd boosterpack
 //#define PWR_BENCHMARK
 
-#define MAXIMUM_ARRAY_SIZE              512
-#define FFT_SAMPLING_FREQUENCY          8000
-#define FIR_SAMPLING_FREQUENCY          20000
+
 
 #define PUSHBUTTON1_PORT                GPIO_PORT_P5
 #define PUSHBUTTON1_PIN                 GPIO_PIN6

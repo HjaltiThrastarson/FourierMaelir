@@ -50,10 +50,7 @@
 #include "global.h"
 #include "application.h"
 
-// Rectangular to clear my FFT image after every round
-const Graphics_Rectangle clearSpace = { 0, 10, 96, 83 };
-const Graphics_Rectangle clearSpaceTopText = { 0, 0, 96, 7 };
-const Graphics_Rectangle clearSpaceCycleText = { 10, 85, 65, 96 };
+
 
 #if defined(__IAR_SYSTEMS_ICC__)
 // Real FFT values that can be used by user application
@@ -175,28 +172,43 @@ void runFftWithLea(void)
     msp_status status;
     uint16_t i;
     int16_t * currentAdcBuffer;
-
+    int16_t * INCREMENT_POINTER;
+    int32_t meanValue;
+    int32_t runningTotal;
+    int32_t value;
+    int32_t dividedValue;
+    int32_t NEW_VALUE;
 
     // Initialize LEA module
     initFft();
 
-    keepAppRunning = true;
 
-    while(keepAppRunning)
-    {
         __bis_SR_register(LPM3_bits + GIE);
 
         // Get the latest buffer pointer to be copied
         currentAdcBuffer = Audio_getActiveBuffer(&gAudioConfig);
 
+        // Find Mean
+        for(i = 0;i<(VECTOR_SIZE);i++){
+            INCREMENT_POINTER = &currentAdcBuffer[i];
+            value = *INCREMENT_POINTER;
+            dividedValue = value/VECTOR_SIZE;
+            meanValue = meanValue + dividedValue;
+        }
+        printf("%d \n",meanValue);
+        // Remove Mean
+        for(i = 0; i<(VECTOR_SIZE);i++){
+             INCREMENT_POINTER = &currentAdcBuffer[i];
+             value = *INCREMENT_POINTER;
+             NEW_VALUE = value-meanValue;
+             *INCREMENT_POINTER = (int16_t) NEW_VALUE;
+        }
         // Copy recorded ADC data to LEA RAM buffer for FFT processing
         for(i = 0; i < (VECTOR_SIZE); i++)
         {
             ((int32_t *)leaMemoryStartAdd.fftDataParam.fftInputOutput)[i] =
                 currentAdcBuffer[i] & 0x0000FFFF;
         }
-
-
         // Call fixed scaling fft function.
         status = msp_cmplx_fft_fixed_q15(&complexFftParams,
                                          leaMemoryStartAdd.fftDataParam.fftInputOutput);
@@ -246,5 +258,6 @@ void runFftWithLea(void)
         }
 
 
-    }
 }
+
+

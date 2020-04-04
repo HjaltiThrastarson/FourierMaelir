@@ -67,6 +67,8 @@ application/audio_collect.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSP
 application/audio_collect.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h
 application/audio_collect.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h
 application/audio_collect.obj: ../application/FFT.h
+application/audio_collect.obj: ../application/fir.h
+application/audio_collect.obj: ../application/UART.h
 
 ../application/audio_collect.c: 
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/stdlib.h: 
@@ -135,3 +137,5 @@ C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_filter.h:
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h: 
 ../application/FFT.h: 
+../application/fir.h: 
+../application/UART.h: 

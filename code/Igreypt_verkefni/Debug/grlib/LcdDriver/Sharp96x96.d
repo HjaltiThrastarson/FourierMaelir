@@ -38,6 +38,8 @@ grlib/LcdDriver/Sharp96x96.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DS
 grlib/LcdDriver/Sharp96x96.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h
 grlib/LcdDriver/Sharp96x96.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h
 grlib/LcdDriver/Sharp96x96.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/FFT.h
+grlib/LcdDriver/Sharp96x96.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/fir.h
+grlib/LcdDriver/Sharp96x96.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/UART.h
 grlib/LcdDriver/Sharp96x96.obj: ../grlib/LcdDriver/HAL_MSP_EXP430FR5994_Sharp96x96.h
 grlib/LcdDriver/Sharp96x96.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/driverlib/MSP430FR5xx_6xx/driverlib.h
 grlib/LcdDriver/Sharp96x96.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/driverlib/MSP430FR5xx_6xx/inc/hw_memmap.h
@@ -109,6 +111,8 @@ C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_filter.h:
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/FFT.h: 
+C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/fir.h: 
+C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/UART.h: 
 ../grlib/LcdDriver/HAL_MSP_EXP430FR5994_Sharp96x96.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/driverlib/MSP430FR5xx_6xx/driverlib.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/driverlib/MSP430FR5xx_6xx/inc/hw_memmap.h: 

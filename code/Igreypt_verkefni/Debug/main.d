@@ -55,6 +55,7 @@ main.obj: C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/stdl
 main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/grlib/images/images.h
 main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/grlib/grlib.h
 main.obj: C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/assert.h
+main.obj: C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/string.h
 main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/audio_collect.h
 main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/audio_playback.h
 main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/application.h
@@ -71,6 +72,8 @@ main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_fi
 main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h
 main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h
 main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/FFT.h
+main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/fir.h
+main.obj: C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/UART.h
 
 ../main.c: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/driverlib/MSP430FR5xx_6xx/driverlib.h: 
@@ -127,6 +130,7 @@ C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/stdlib.h:
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/grlib/images/images.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/grlib/grlib.h: 
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/assert.h: 
+C:/ti/ccs930/ccs/tools/compiler/ti-cgt-msp430_18.12.4.LTS/include/string.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/audio_collect.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/audio_playback.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/application.h: 
@@ -143,3 +147,5 @@ C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_filter.h:
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_transform.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/DSPLib/include/DSPLib_utility.h: 
 C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/FFT.h: 
+C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/fir.h: 
+C:/Users/Hjalti/workspace_v9/Igreypt_verkefni/application/UART.h: 

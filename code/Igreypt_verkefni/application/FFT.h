@@ -40,13 +40,13 @@
 #ifndef FFT_H
 #define FFT_H
 
-#define LOG2_SIZE       8
-#define SQRT_SIZE       16
-#define SCALE_FACTOR    0x00026000
+
 
 extern void initFft(void);
 extern void shutdownActivity(void);
 extern void runFftWithLea(void);
 extern void testFft(void);
+extern void runFftSecondTime(void);
+
 
 #endif /* FFT_H */
