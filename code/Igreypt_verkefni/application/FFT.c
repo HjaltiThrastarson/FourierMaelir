@@ -174,7 +174,6 @@ void runFftWithLea(void)
     int16_t * currentAdcBuffer;
     int16_t * INCREMENT_POINTER;
     int32_t meanValue;
-    int32_t runningTotal;
     int32_t value;
     int32_t dividedValue;
     int32_t NEW_VALUE;
@@ -184,6 +183,8 @@ void runFftWithLea(void)
 
 
         __bis_SR_register(LPM3_bits + GIE);
+        //Audio_stopCollect(&gAudioConfig);
+        //Audio_shutdownCollect(&gAudioConfig);
 
         // Get the latest buffer pointer to be copied
         currentAdcBuffer = Audio_getActiveBuffer(&gAudioConfig);
@@ -191,15 +192,18 @@ void runFftWithLea(void)
         // Find Mean
         for(i = 0;i<(VECTOR_SIZE);i++){
             INCREMENT_POINTER = &currentAdcBuffer[i];
-            value = *INCREMENT_POINTER;
+            value = (int32_t) *INCREMENT_POINTER;
+            //printf("%d",i);
+            //printf("%d \n",value);
             dividedValue = value/VECTOR_SIZE;
             meanValue = meanValue + dividedValue;
         }
+        //printf("%d \n",i);
         printf("%d \n",meanValue);
         // Remove Mean
         for(i = 0; i<(VECTOR_SIZE);i++){
              INCREMENT_POINTER = &currentAdcBuffer[i];
-             value = *INCREMENT_POINTER;
+             value = (int32_t) *INCREMENT_POINTER;
              NEW_VALUE = value-meanValue;
              *INCREMENT_POINTER = (int16_t) NEW_VALUE;
         }

@@ -177,6 +177,10 @@ __interrupt void dmaIsrHandler(void)
         // Switch the audio buffer for ping-pong buffer
         Audio_switchBuffer(&gAudioConfig);
 
+        //shutdown audio collect
+        //Audio_stopCollect(&gAudioConfig);
+        //Audio_shutdownCollect(&gAudioConfig);
+
         // Exit low power mode on wake-up
         __bic_SR_register_on_exit(LPM4_bits);
         break;
