@@ -261,7 +261,8 @@ void runFftWithLea(void)
             FFT_data[i] = mag;
         }
 
-
+        Audio_stopCollect(&gAudioConfig);
+        Audio_shutdownCollect(&gAudioConfig);
 }
 
 

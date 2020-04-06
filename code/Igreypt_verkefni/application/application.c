@@ -81,15 +81,16 @@ __persistent bool keepAppRunning = false;
 #elif defined(__TI_COMPILER_VERSION__)
 #pragma PERSISTENT(keepAppRunning)
 bool keepAppRunning = false;
+bool fyrstaSkipti = false;
 #endif
 
 void runApplication(void)
 {
-    keepAppRunning = true;
+    fyrstaSkipti = true;
     while(1)
     {
         //runFftWithLea();
-        if(keepAppRunning == true){
+        if(fyrstaSkipti == true){
             runFftWithLea();
             for(i = 0;i<(VECTOR_SIZE/2);i++){
                 int FFT_data_int = FFT_data[pointer++];
@@ -97,6 +98,7 @@ void runApplication(void)
                 fflush(stdout);
             }
         }
+        fyrstaSkipti = false;
         // Set a Switch debounce to 500ms
         __delay_cycles(0.5 * __SYSTEM_FREQUENCY_MHZ__);
 
@@ -144,8 +146,8 @@ __interrupt void port5IsrHandler(void)
 
         break;
     case P5IV_P5IFG6:
-        printf("Hello World");
         runFftWithLea();
+        pointer = 0;
         for(i = 0;i<(VECTOR_SIZE/2);i++){
             int FFT_data_int = FFT_data[pointer++];
             printf("%d \n",FFT_data_int);

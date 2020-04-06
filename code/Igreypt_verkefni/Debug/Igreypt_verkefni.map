@@ -1,10 +1,10 @@
 ******************************************************************************
                   MSP430 Linker PC v18.12.4                    
 ******************************************************************************
->> Linked Sun Apr  5 20:46:21 2020
+>> Linked Mon Apr  6 11:38:46 2020
 
 OUTPUT FILE NAME:   <Igreypt_verkefni.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs_mpu"  address: 00004952
+ENTRY POINT SYMBOL: "_c_int00_noargs_mpu"  address: 0000494a
 
 
 MEMORY CONFIGURATION
@@ -17,10 +17,10 @@ MEMORY CONFIGURATION
   INFOC                 00001880   00000080  00000000  00000080  RWIX
   INFOB                 00001900   00000080  00000000  00000080  RWIX
   INFOA                 00001980   00000080  00000000  00000080  RWIX
-  RAM                   00001c00   00001000  00000744  000008bc  RWIX
+  RAM                   00001c00   00001000  00000746  000008ba  RWIX
   LEARAM                00002c00   00000ec8  000005a4  00000924  RWIX
   LEASTACK              00003ac8   00000138  00000000  00000138  RWIX
-  FRAM                  00004000   0000bf80  00000bae  0000b3d2  RWIX
+  FRAM                  00004000   0000bf80  00000b96  0000b3ea  RWIX
   JTAGSIGNATURE         0000ff80   00000004  00000004  00000000  RWIX  ffff 
   BSLSIGNATURE          0000ff84   00000004  00000004  00000000  RWIX  ffff 
   IPESIGNATURE          0000ff88   00000008  00000008  00000000  RWIX  ffff 
@@ -80,7 +80,7 @@ MEMORY CONFIGURATION
   INT53                 0000fffa   00000002  00000002  00000000  RWIX
   INT54                 0000fffc   00000002  00000002  00000000  RWIX
   RESET                 0000fffe   00000002  00000002  00000000  RWIX
-  FRAM2                 00010000   00034000  00005188  0002ee78  RWIX
+  FRAM2                 00010000   00034000  0000520a  0002edf6  RWIX
 
 
 SECTION ALLOCATION MAP
@@ -113,27 +113,26 @@ section   page    origin      length       input sections
 .ipe:_isr 
 *          0    00004800    00000000     UNINITIALIZED
 
-.cinit     0    00004b24    0000008a     
-                  00004b24    00000059     (.cinit..data.load) [load image, compression = lzss]
-                  00004b7d    00000001     --HOLE-- [fill = 0]
-                  00004b7e    0000000c     (__TI_handler_table)
-                  00004b8a    00000006     (.cinit..bss.load) [load image, compression = zero_init]
-                  00004b90    00000006     (.cinit..leaRAM.load) [load image, compression = zero_init]
-                  00004b96    00000018     (__TI_cinit_table)
+.cinit     0    00004b10    00000086     
+                  00004b10    00000056     (.cinit..data.load) [load image, compression = lzss]
+                  00004b66    0000000c     (__TI_handler_table)
+                  00004b72    00000006     (.cinit..bss.load) [load image, compression = zero_init]
+                  00004b78    00000006     (.cinit..leaRAM.load) [load image, compression = zero_init]
+                  00004b7e    00000018     (__TI_cinit_table)
 
 .init_array 
 *          0    00004000    00000000     UNINITIALIZED
 
 .text:_isr 
-*          0    00004800    000001b2     
-                  00004800    0000009c     application.obj (.text:_isr:port5IsrHandler)
-                  0000489c    0000007c     application.obj (.text:_isr:dmaIsrHandler)
-                  00004918    0000003a     audio_playback.obj (.text:_isr:timer2A0Isr)
-                  00004952    00000020     rts430x_lc_rd_eabi.lib : boot.c.obj (.text:_isr:_c_int00_noargs_mpu)
-                  00004972    0000001c     msp_lea_isr.obj (.text:_isr:msp_lea_isr)
-                  0000498e    00000012     benchmark.obj (.text:_isr:TIMER2_A1_ISR)
-                  000049a0    0000000a     application.obj (.text:_isr:ADC12_ISR)
-                  000049aa    00000008     rts430x_lc_rd_eabi.lib : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
+*          0    00004800    000001aa     
+                  00004800    00000094     application.obj (.text:_isr:port5IsrHandler)
+                  00004894    0000007c     application.obj (.text:_isr:dmaIsrHandler)
+                  00004910    0000003a     audio_playback.obj (.text:_isr:timer2A0Isr)
+                  0000494a    00000020     rts430x_lc_rd_eabi.lib : boot.c.obj (.text:_isr:_c_int00_noargs_mpu)
+                  0000496a    0000001c     msp_lea_isr.obj (.text:_isr:msp_lea_isr)
+                  00004986    00000012     benchmark.obj (.text:_isr:TIMER2_A1_ISR)
+                  00004998    0000000a     application.obj (.text:_isr:ADC12_ISR)
+                  000049a2    00000008     rts430x_lc_rd_eabi.lib : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
 
 .bss       0    00001c00    0000050c     UNINITIALIZED
                   00001c00    00000200     (.common:adcBuffer0)
@@ -158,19 +157,20 @@ section   page    origin      length       input sections
                   00002108    00000002     (.common:real)
                   0000210a    00000002     (.common:real_abs)
 
-.data      0    0000210c    00000198     UNINITIALIZED
+.data      0    0000210c    0000019a     UNINITIALIZED
                   0000210c    000000c8     rts430x_lc_rd_eabi.lib : defs.c.obj (.data:_ftable)
                   000021d4    00000078                            : host_device.c.obj (.data:_device)
                   0000224c    0000003c                            : host_device.c.obj (.data:_stream)
-                  00002288    00000004                            : exit_gvars.c.obj (.data:__TI_cleanup_ptr)
-                  0000228c    00000004                            : exit_gvars.c.obj (.data:__TI_dtors_ptr)
-                  00002290    00000004                            : _lock.c.obj (.data:_lock)
-                  00002294    00000004                            : _lock.c.obj (.data:_unlock)
-                  00002298    00000004     application.obj (.data)
-                  0000229c    00000002     rts430x_lc_rd_eabi.lib : defs.c.obj (.data)
-                  0000229e    00000002                            : errno.c.obj (.data)
-                  000022a0    00000002                            : exit.c.obj (.data)
-                  000022a2    00000002                            : memory.c.obj (.data)
+                  00002288    00000005     application.obj (.data)
+                  0000228d    00000001     --HOLE--
+                  0000228e    00000004     rts430x_lc_rd_eabi.lib : exit_gvars.c.obj (.data:__TI_cleanup_ptr)
+                  00002292    00000004                            : exit_gvars.c.obj (.data:__TI_dtors_ptr)
+                  00002296    00000004                            : _lock.c.obj (.data:_lock)
+                  0000229a    00000004                            : _lock.c.obj (.data:_unlock)
+                  0000229e    00000002                            : defs.c.obj (.data)
+                  000022a0    00000002                            : errno.c.obj (.data)
+                  000022a2    00000002                            : exit.c.obj (.data)
+                  000022a4    00000002                            : memory.c.obj (.data)
 
 .stack     0    00002b60    000000a0     UNINITIALIZED
                   00002b60    00000004     rts430x_lc_rd_eabi.lib : boot.c.obj (.stack)
@@ -314,17 +314,17 @@ SYSNMI     0    0000fffc    00000002
 .reset     0    0000fffe    00000002     
                   0000fffe    00000002     rts430x_lc_rd_eabi.lib : boot.c.obj (.reset)
 
-.const     0    000049b2    00000172     
-                  000049b2    00000101     rts430x_lc_rd_eabi.lib : ctype.c.obj (.const:.string:_ctypes_)
-                  00004ab3    00000001     --HOLE-- [fill = 0]
-                  00004ab4    00000026                            : _printfi.c.obj (.const:.string)
-                  00004ada    0000001c     gpio.obj (.const:GPIO_PORT_TO_BASE)
-                  00004af6    00000012     application.obj (.const:.string)
-                  00004b08    0000000e     audio_collect.obj (.const:$P$T0$1)
-                  00004b16    00000008     audio_collect.obj (.const:$P$T1$2)
-                  00004b1e    00000006     FFT.obj (.const:.string)
+.const     0    000049aa    00000166     
+                  000049aa    00000101     rts430x_lc_rd_eabi.lib : ctype.c.obj (.const:.string:_ctypes_)
+                  00004aab    00000001     --HOLE-- [fill = 0]
+                  00004aac    00000026                            : _printfi.c.obj (.const:.string)
+                  00004ad2    0000001c     gpio.obj (.const:GPIO_PORT_TO_BASE)
+                  00004aee    0000000e     audio_collect.obj (.const:$P$T0$1)
+                  00004afc    00000008     audio_collect.obj (.const:$P$T1$2)
+                  00004b04    00000006     FFT.obj (.const:.string)
+                  00004b0a    00000006     application.obj (.const:.string)
 
-.text      0    00010000    00005188     
+.text      0    00010000    0000520a     
                   00010000    00000466     rts430x_lc_rd_eabi.lib : frcdivd.c.obj (.text:__TI_frcdivd)
                   00010466    0000034e                            : div64u.c.obj (.text:__mspabi_divull)
                   000107b4    000002e0                            : addd.c.obj (.text:__mspabi_addd)
@@ -341,137 +341,142 @@ SYSNMI     0    0000fffc    00000002
                   00012182    000001c8                            : _printfi.c.obj (.text:fcvt)
                   0001234a    000001a2                            : _printfi.c.obj (.text:_pconv_e)
                   000124ec    00000170                            : _printfi.c.obj (.text:_pconv_a)
-                  0001265c    0000015e     FFT.obj (.text:runFftWithLea)
-                  000127ba    0000015a     rts430x_lc_rd_eabi.lib : s_scalbn.c.obj (.text:scalbn)
-                  00012914    0000014a     msp_cmplx_fft_fixed_q15.obj (.text:msp_cmplx_fft_fixed_q15)
-                  00012a5e    00000148     rts430x_lc_rd_eabi.lib : _printfi.c.obj (.text:_pproc_diouxp)
-                  00012ba6    00000136     msp_cmplx_bitrev_q15.obj (.text:msp_cmplx_bitrev_q15)
-                  00012cdc    0000012c     rts430x_lc_rd_eabi.lib : memory.c.obj (.text:aligned_alloc)
-                  00012e08    00000128                            : _printfi.c.obj (.text:_ltostr)
-                  00012f30    00000126     audio_collect.obj (.text:Audio_setupCollect)
-                  00013056    000000fc     rts430x_lc_rd_eabi.lib : _printfi.c.obj (.text:_pconv_g)
-                  00013152    000000f0                            : fputs.c.obj (.text:fputs)
-                  00013242    000000ea                            : _printfi.c.obj (.text:_pproc_fwp)
-                  0001332c    000000e2                            : memory.c.obj (.text:free)
-                  0001340e    000000de                            : setvbuf.c.obj (.text:setvbuf)
-                  000134ec    000000d8                            : cmpd.c.obj (.text:__mspabi_cmpd)
-                  000135c4    000000c8                            : _printfi.c.obj (.text:_pproc_wstr)
-                  0001368c    000000b2                            : renormd.c.obj (.text:__TI_renormd)
-                  0001373e    000000a6                            : _printfi.c.obj (.text:_pproc_str)
-                  000137e4    000000a6                            : s_frexp.c.obj (.text:frexp)
-                  0001388a    0000009e                            : fltlid.c.obj (.text:__mspabi_fltlid)
-                  00013928    0000009e     application.obj (.text:runApplication)
-                  000139c6    0000009a     rts430x_lc_rd_eabi.lib : hostlseek.c.obj (.text:HOSTlseek)
-                  00013a60    00000090                            : _printfi.c.obj (.text:_ecpy)
-                  00013af0    00000090                            : _printfi.c.obj (.text:_mcpy)
-                  00013b80    00000090                            : fputc.c.obj (.text:fputc)
-                  00013c10    00000082     dma.obj (.text:DMA_init)
-                  00013c92    00000080     main.obj (.text:initGpio)
-                  00013d12    00000080     rts430x_lc_rd_eabi.lib : ltoa.c.obj (.text:ltoa)
-                  00013d92    0000007e                            : _io_perm.c.obj (.text:__TI_wrt_ok)
-                  00013e10    0000007c     timer_a.obj (.text:Timer_A_initUpMode)
-                  00013e8c    00000078     rts430x_lc_rd_eabi.lib : _printfi.c.obj (.text:_pconv_f)
-                  00013f04    00000076                            : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
-                  00013f7a    00000074                            : hostrename.c.obj (.text:HOSTrename)
-                  00013fee    00000074                            : fclose.c.obj (.text:__TI_closefile)
-                  00014062    00000074                            : memory.c.obj (.text:split)
-                  000140d6    00000070                            : hostopen.c.obj (.text:HOSTopen)
-                  00014146    0000006c                            : hostwrite.c.obj (.text:HOSTwrite)
-                  000141b2    0000006a                            : hostread.c.obj (.text:HOSTread)
-                  0001421c    0000006a                            : fseek.c.obj (.text:fseek)
-                  00014286    00000066                            : fixdli.c.obj (.text:__mspabi_fixdli)
-                  000142ec    00000064                            : fflush.c.obj (.text:__TI_doflush)
-                  00014350    00000062                            : atoi.c.obj (.text:atoi)
-                  000143b2    0000005e     audio_collect.obj (.text:Audio_switchBuffer)
-                  00014410    0000005a     rts430x_lc_rd_eabi.lib : close.c.obj (.text:close)
-                  0001446a    0000005a                            : getdevice.c.obj (.text:getdevice)
-                  000144c4    00000058                            : fflush.c.obj (.text:fflush)
-                  0001451c    00000058     main.obj (.text:main)
-                  00014574    00000058     rts430x_lc_rd_eabi.lib : div32u.asm.obj (.text)
-                  000145cc    00000056     dac8311.obj (.text:DAC8311_writeRegister)
-                  00014622    00000054     rts430x_lc_rd_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit_hold_wdt:__TI_auto_init_nobinit_nopinit_hold_wdt)
-                  00014676    00000052     msp_lea_init.obj (.text:msp_lea_init)
-                  000146c8    0000004e     rts430x_lc_rd_eabi.lib : hostclose.c.obj (.text:HOSTclose)
-                  00014716    0000004e                            : _printfi.c.obj (.text:_fcpy)
-                  00014764    0000004a     gpio.obj (.text:GPIO_setAsInputPinWithPullUpResistor)
-                  000147ae    0000004a     rts430x_lc_rd_eabi.lib : exit.c.obj (.text:exit)
-                  000147f8    0000004a     FFT.obj (.text:initFft)
-                  00014842    0000004a     rts430x_lc_rd_eabi.lib : printf.c.obj (.text:printf)
-                  0001488c    00000046                            : hostunlink.c.obj (.text:HOSTunlink)
-                  000148d2    00000040                            : div32s.asm.obj (.text)
-                  00014912    0000003e                            : asr32.asm.obj (.text:l_asr_const)
-                  00014950    0000003e                            : lsl32.asm.obj (.text:l_lsl_const)
-                  0001498e    0000003e                            : lsr32.asm.obj (.text:l_lsr_const)
-                  000149cc    0000003e                            : lseek.c.obj (.text:lseek)
-                  00014a0a    0000003c                            : write.c.obj (.text:write)
-                  00014a46    0000003a                            : lsl64.c.obj (.text:__mspabi_sllll)
-                  00014a80    0000003a                            : lsr64.c.obj (.text:__mspabi_srlll)
-                  00014aba    00000038     timer_a.obj (.text:Timer_A_initCompareMode)
-                  00014af2    00000036     rts430x_lc_rd_eabi.lib : fopen.c.obj (.text:__TI_cleanup)
-                  00014b28    00000036                            : trgmsg.c.obj (.text:__TI_writemsg)
-                  00014b5e    00000034     main.obj (.text:initClock)
-                  00014b92    00000032     rts430x_lc_rd_eabi.lib : trgmsg.c.obj (.text:__TI_readmsg)
-                  00014bc4    00000032                            : subd.c.obj (.text:__mspabi_subd)
-                  00014bf6    00000032                            : strncpy.c.obj (.text:strncpy)
-                  00014c28    00000030     dma.obj (.text:DMA_setDstAddress)
-                  00014c58    00000030     rts430x_lc_rd_eabi.lib : unlink.c.obj (.text:unlink)
-                  00014c88    0000002e     dma.obj (.text:DMA_setSrcAddress)
-                  00014cb6    0000002e     gpio.obj (.text:GPIO_selectInterruptEdge)
-                  00014ce4    0000002e     rts430x_lc_rd_eabi.lib : negd.c.obj (.text:__mspabi_negd)
-                  00014d12    0000002e                            : s_copysign.c.obj (.text:copysign)
-                  00014d40    0000002e                            : getdevice.c.obj (.text:finddevice)
-                  00014d6e    0000002c     MSPMPU_INIT_LIB_CCS_msp430_large_code_restricted_data.lib : mpu_init.o (.text:__mpu_init)
-                  00014d9a    0000002c     rts430x_lc_rd_eabi.lib : memory.c.obj (.text:free_list_insert)
-                  00014dc6    0000002a                            : memory.c.obj (.text:free_list_remove)
-                  00014df0    00000028                            : fixdi.c.obj (.text:__mspabi_fixdi)
-                  00014e18    00000024     audio_playback.obj (.text:Audio_stopPlayback)
-                  00014e3c    00000024     rts430x_lc_rd_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init)
-                  00014e60    00000024                            : mult32_f5hw.asm.obj (.text)
-                  00014e84    00000022     audio_collect.obj (.text:Audio_startCollect)
-                  00014ea6    0000001e     gpio.obj (.text:GPIO_clearInterrupt)
-                  00014ec4    0000001e     gpio.obj (.text:GPIO_disableInterrupt)
-                  00014ee2    0000001e     gpio.obj (.text:GPIO_enableInterrupt)
-                  00014f00    0000001e     rts430x_lc_rd_eabi.lib : memccpy.c.obj (.text:memccpy)
-                  00014f1e    0000001c     audio_collect.obj (.text:Audio_getActiveBuffer)
-                  00014f3a    0000001c     gpio.obj (.text:GPIO_setOutputHighOnPin)
-                  00014f56    0000001c     gpio.obj (.text:GPIO_setOutputLowOnPin)
-                  00014f72    0000001c     rts430x_lc_rd_eabi.lib : strchr.c.obj (.text:strchr)
-                  00014f8e    0000001c                            : strcmp.c.obj (.text:strcmp)
-                  00014faa    0000001a     dac8311.obj (.text:DAC8311_setLowPowerMode)
-                  00014fc4    00000018     rts430x_lc_rd_eabi.lib : mult16_f5hw.asm.obj (.text)
-                  00014fdc    00000016                            : memory.c.obj (.text:heap_start)
-                  00014ff2    00000016                            : memchr.c.obj (.text:memchr)
-                  00015008    00000016                            : memset.c.obj (.text:memset)
-                  0001501e    00000016     msp_lea_patch.obj (.text:msp_lea_initCommandTable)
-                  00015034    00000016     rts430x_lc_rd_eabi.lib : div16u.asm.obj (.text)
-                  0001504a    00000016                            : wcslen.c.obj (.text:wcslen)
-                  00015060    00000014                            : memcpy.c.obj (.text:memcpy)
-                  00015074    00000012                            : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
-                  00015086    00000012                            : strcpy.c.obj (.text:strcpy)
-                  00015098    00000012                            : toupper.c.obj (.text:toupper)
-                  000150aa    00000010     dma.obj (.text:DMA_disableTransfers)
-                  000150ba    00000010     dma.obj (.text:DMA_enableTransfers)
-                  000150ca    00000010     rts430x_lc_rd_eabi.lib : asr32.asm.obj (.text:l_asr)
-                  000150da    00000010                            : lsl32.asm.obj (.text:l_lsl)
-                  000150ea    00000010                            : lsr32.asm.obj (.text:l_lsr)
-                  000150fa    0000000e     dma.obj (.text:DMA_disableInterrupt)
-                  00015108    0000000e     dma.obj (.text:DMA_enableInterrupt)
-                  00015116    0000000e     rts430x_lc_rd_eabi.lib : strlen.c.obj (.text:strlen)
-                  00015124    0000000c                            : fltid.c.obj (.text:__mspabi_fltid)
-                  00015130    0000000a     dac8311.obj (.text:DAC8311_updateDacOut)
-                  0001513a    0000000a     timer_a.obj (.text:Timer_A_clearCaptureCompareInterrupt)
-                  00015144    0000000a     rts430x_lc_rd_eabi.lib : abs.c.obj (.text:abs)
-                  0001514e    00000008     timer_a.obj (.text:Timer_A_stop)
-                  00015156    00000008     rts430x_lc_rd_eabi.lib : memory.c.obj (.text:malloc)
-                  0001515e    00000006     dma.obj (.text:DMA_disableTransferDuringReadModifyWrite)
-                  00015164    00000006     timer_a.obj (.text:Timer_A_clear)
-                  0001516a    00000006     timer_a.obj (.text:Timer_A_startCounter)
-                  00015170    00000006     rts430x_lc_rd_eabi.lib : printf.c.obj (.text:_outc)
-                  00015176    00000006                            : exit.c.obj (.text:abort)
-                  0001517c    00000004                            : printf.c.obj (.text:_outs)
-                  00015180    00000004                            : pre_init.c.obj (.text:_system_pre_init)
-                  00015184    00000002                            : _lock.c.obj (.text:_nop)
-                  00015186    00000002                            : startup.c.obj (.text:_system_post_cinit)
+                  0001265c    0000016e     FFT.obj (.text:runFftWithLea)
+                  000127ca    0000015a     rts430x_lc_rd_eabi.lib : s_scalbn.c.obj (.text:scalbn)
+                  00012924    0000014a     msp_cmplx_fft_fixed_q15.obj (.text:msp_cmplx_fft_fixed_q15)
+                  00012a6e    00000148     rts430x_lc_rd_eabi.lib : _printfi.c.obj (.text:_pproc_diouxp)
+                  00012bb6    00000136     msp_cmplx_bitrev_q15.obj (.text:msp_cmplx_bitrev_q15)
+                  00012cec    0000012c     rts430x_lc_rd_eabi.lib : memory.c.obj (.text:aligned_alloc)
+                  00012e18    00000128                            : _printfi.c.obj (.text:_ltostr)
+                  00012f40    00000126     audio_collect.obj (.text:Audio_setupCollect)
+                  00013066    000000fc     rts430x_lc_rd_eabi.lib : _printfi.c.obj (.text:_pconv_g)
+                  00013162    000000f0                            : fputs.c.obj (.text:fputs)
+                  00013252    000000ea                            : _printfi.c.obj (.text:_pproc_fwp)
+                  0001333c    000000e2                            : memory.c.obj (.text:free)
+                  0001341e    000000de                            : setvbuf.c.obj (.text:setvbuf)
+                  000134fc    000000d8                            : cmpd.c.obj (.text:__mspabi_cmpd)
+                  000135d4    000000c8                            : _printfi.c.obj (.text:_pproc_wstr)
+                  0001369c    000000b2                            : renormd.c.obj (.text:__TI_renormd)
+                  0001374e    000000a6                            : _printfi.c.obj (.text:_pproc_str)
+                  000137f4    000000a6                            : s_frexp.c.obj (.text:frexp)
+                  0001389a    000000a2     application.obj (.text:runApplication)
+                  0001393c    0000009e     rts430x_lc_rd_eabi.lib : fltlid.c.obj (.text:__mspabi_fltlid)
+                  000139da    0000009a                            : hostlseek.c.obj (.text:HOSTlseek)
+                  00013a74    00000090                            : _printfi.c.obj (.text:_ecpy)
+                  00013b04    00000090                            : _printfi.c.obj (.text:_mcpy)
+                  00013b94    00000090                            : fputc.c.obj (.text:fputc)
+                  00013c24    00000082     dma.obj (.text:DMA_init)
+                  00013ca6    00000080     main.obj (.text:initGpio)
+                  00013d26    00000080     rts430x_lc_rd_eabi.lib : ltoa.c.obj (.text:ltoa)
+                  00013da6    0000007e                            : _io_perm.c.obj (.text:__TI_wrt_ok)
+                  00013e24    0000007c     timer_a.obj (.text:Timer_A_initUpMode)
+                  00013ea0    00000078     rts430x_lc_rd_eabi.lib : _printfi.c.obj (.text:_pconv_f)
+                  00013f18    00000076                            : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
+                  00013f8e    00000074                            : hostrename.c.obj (.text:HOSTrename)
+                  00014002    00000074                            : fclose.c.obj (.text:__TI_closefile)
+                  00014076    00000074                            : memory.c.obj (.text:split)
+                  000140ea    00000070                            : hostopen.c.obj (.text:HOSTopen)
+                  0001415a    0000006c                            : hostwrite.c.obj (.text:HOSTwrite)
+                  000141c6    0000006a                            : hostread.c.obj (.text:HOSTread)
+                  00014230    0000006a                            : fseek.c.obj (.text:fseek)
+                  0001429a    00000066                            : fixdli.c.obj (.text:__mspabi_fixdli)
+                  00014300    00000064                            : fflush.c.obj (.text:__TI_doflush)
+                  00014364    00000062                            : atoi.c.obj (.text:atoi)
+                  000143c6    0000005e     audio_collect.obj (.text:Audio_switchBuffer)
+                  00014424    0000005a     rts430x_lc_rd_eabi.lib : close.c.obj (.text:close)
+                  0001447e    0000005a                            : getdevice.c.obj (.text:getdevice)
+                  000144d8    00000058                            : fflush.c.obj (.text:fflush)
+                  00014530    00000058     main.obj (.text:main)
+                  00014588    00000058     rts430x_lc_rd_eabi.lib : div32u.asm.obj (.text)
+                  000145e0    00000056     dac8311.obj (.text:DAC8311_writeRegister)
+                  00014636    00000054     rts430x_lc_rd_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit_hold_wdt:__TI_auto_init_nobinit_nopinit_hold_wdt)
+                  0001468a    00000052     msp_lea_init.obj (.text:msp_lea_init)
+                  000146dc    0000004e     rts430x_lc_rd_eabi.lib : hostclose.c.obj (.text:HOSTclose)
+                  0001472a    0000004e                            : _printfi.c.obj (.text:_fcpy)
+                  00014778    0000004a     gpio.obj (.text:GPIO_setAsInputPinWithPullUpResistor)
+                  000147c2    0000004a     rts430x_lc_rd_eabi.lib : exit.c.obj (.text:exit)
+                  0001480c    0000004a     FFT.obj (.text:initFft)
+                  00014856    0000004a     rts430x_lc_rd_eabi.lib : printf.c.obj (.text:printf)
+                  000148a0    00000046                            : hostunlink.c.obj (.text:HOSTunlink)
+                  000148e6    00000040                            : div32s.asm.obj (.text)
+                  00014926    0000003e                            : asr32.asm.obj (.text:l_asr_const)
+                  00014964    0000003e                            : lsl32.asm.obj (.text:l_lsl_const)
+                  000149a2    0000003e                            : lsr32.asm.obj (.text:l_lsr_const)
+                  000149e0    0000003e                            : lseek.c.obj (.text:lseek)
+                  00014a1e    0000003c                            : write.c.obj (.text:write)
+                  00014a5a    0000003a                            : lsl64.c.obj (.text:__mspabi_sllll)
+                  00014a94    0000003a                            : lsr64.c.obj (.text:__mspabi_srlll)
+                  00014ace    00000038     timer_a.obj (.text:Timer_A_initCompareMode)
+                  00014b06    00000036     rts430x_lc_rd_eabi.lib : fopen.c.obj (.text:__TI_cleanup)
+                  00014b3c    00000036                            : trgmsg.c.obj (.text:__TI_writemsg)
+                  00014b72    00000034     main.obj (.text:initClock)
+                  00014ba6    00000032     rts430x_lc_rd_eabi.lib : trgmsg.c.obj (.text:__TI_readmsg)
+                  00014bd8    00000032                            : subd.c.obj (.text:__mspabi_subd)
+                  00014c0a    00000032                            : strncpy.c.obj (.text:strncpy)
+                  00014c3c    00000030     dma.obj (.text:DMA_setDstAddress)
+                  00014c6c    00000030     rts430x_lc_rd_eabi.lib : unlink.c.obj (.text:unlink)
+                  00014c9c    0000002e     dma.obj (.text:DMA_setSrcAddress)
+                  00014cca    0000002e     gpio.obj (.text:GPIO_selectInterruptEdge)
+                  00014cf8    0000002e     rts430x_lc_rd_eabi.lib : negd.c.obj (.text:__mspabi_negd)
+                  00014d26    0000002e                            : s_copysign.c.obj (.text:copysign)
+                  00014d54    0000002e                            : getdevice.c.obj (.text:finddevice)
+                  00014d82    0000002c     MSPMPU_INIT_LIB_CCS_msp430_large_code_restricted_data.lib : mpu_init.o (.text:__mpu_init)
+                  00014dae    0000002c     rts430x_lc_rd_eabi.lib : memory.c.obj (.text:free_list_insert)
+                  00014dda    0000002a     adc12_b.obj (.text:ADC12_B_disableConversions)
+                  00014e04    0000002a     rts430x_lc_rd_eabi.lib : memory.c.obj (.text:free_list_remove)
+                  00014e2e    00000028                            : fixdi.c.obj (.text:__mspabi_fixdi)
+                  00014e56    00000024     audio_playback.obj (.text:Audio_stopPlayback)
+                  00014e7a    00000024     rts430x_lc_rd_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init)
+                  00014e9e    00000024                            : mult32_f5hw.asm.obj (.text)
+                  00014ec2    00000022     audio_collect.obj (.text:Audio_startCollect)
+                  00014ee4    00000020     audio_collect.obj (.text:Audio_stopCollect)
+                  00014f04    0000001e     gpio.obj (.text:GPIO_clearInterrupt)
+                  00014f22    0000001e     gpio.obj (.text:GPIO_disableInterrupt)
+                  00014f40    0000001e     gpio.obj (.text:GPIO_enableInterrupt)
+                  00014f5e    0000001e     rts430x_lc_rd_eabi.lib : memccpy.c.obj (.text:memccpy)
+                  00014f7c    0000001c     audio_collect.obj (.text:Audio_getActiveBuffer)
+                  00014f98    0000001c     gpio.obj (.text:GPIO_setOutputHighOnPin)
+                  00014fb4    0000001c     gpio.obj (.text:GPIO_setOutputLowOnPin)
+                  00014fd0    0000001c     rts430x_lc_rd_eabi.lib : strchr.c.obj (.text:strchr)
+                  00014fec    0000001c                            : strcmp.c.obj (.text:strcmp)
+                  00015008    0000001a     dac8311.obj (.text:DAC8311_setLowPowerMode)
+                  00015022    00000018     rts430x_lc_rd_eabi.lib : mult16_f5hw.asm.obj (.text)
+                  0001503a    00000016                            : memory.c.obj (.text:heap_start)
+                  00015050    00000016                            : memchr.c.obj (.text:memchr)
+                  00015066    00000016                            : memset.c.obj (.text:memset)
+                  0001507c    00000016     msp_lea_patch.obj (.text:msp_lea_initCommandTable)
+                  00015092    00000016     rts430x_lc_rd_eabi.lib : div16u.asm.obj (.text)
+                  000150a8    00000016                            : wcslen.c.obj (.text:wcslen)
+                  000150be    00000014                            : memcpy.c.obj (.text:memcpy)
+                  000150d2    00000012                            : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
+                  000150e4    00000012                            : strcpy.c.obj (.text:strcpy)
+                  000150f6    00000012                            : toupper.c.obj (.text:toupper)
+                  00015108    00000010     dma.obj (.text:DMA_disableTransfers)
+                  00015118    00000010     dma.obj (.text:DMA_enableTransfers)
+                  00015128    00000010     rts430x_lc_rd_eabi.lib : asr32.asm.obj (.text:l_asr)
+                  00015138    00000010                            : lsl32.asm.obj (.text:l_lsl)
+                  00015148    00000010                            : lsr32.asm.obj (.text:l_lsr)
+                  00015158    0000000e     audio_collect.obj (.text:Audio_shutdownCollect)
+                  00015166    0000000e     dma.obj (.text:DMA_disableInterrupt)
+                  00015174    0000000e     dma.obj (.text:DMA_enableInterrupt)
+                  00015182    0000000e     rts430x_lc_rd_eabi.lib : strlen.c.obj (.text:strlen)
+                  00015190    0000000c     adc12_b.obj (.text:ADC12_B_disable)
+                  0001519c    0000000c     rts430x_lc_rd_eabi.lib : fltid.c.obj (.text:__mspabi_fltid)
+                  000151a8    0000000a     adc12_b.obj (.text:ADC12_B_isBusy)
+                  000151b2    0000000a     dac8311.obj (.text:DAC8311_updateDacOut)
+                  000151bc    0000000a     timer_a.obj (.text:Timer_A_clearCaptureCompareInterrupt)
+                  000151c6    0000000a     rts430x_lc_rd_eabi.lib : abs.c.obj (.text:abs)
+                  000151d0    00000008     timer_a.obj (.text:Timer_A_stop)
+                  000151d8    00000008     rts430x_lc_rd_eabi.lib : memory.c.obj (.text:malloc)
+                  000151e0    00000006     dma.obj (.text:DMA_disableTransferDuringReadModifyWrite)
+                  000151e6    00000006     timer_a.obj (.text:Timer_A_clear)
+                  000151ec    00000006     timer_a.obj (.text:Timer_A_startCounter)
+                  000151f2    00000006     rts430x_lc_rd_eabi.lib : printf.c.obj (.text:_outc)
+                  000151f8    00000006                            : exit.c.obj (.text:abort)
+                  000151fe    00000004                            : printf.c.obj (.text:_outs)
+                  00015202    00000004                            : pre_init.c.obj (.text:_system_pre_init)
+                  00015206    00000002                            : _lock.c.obj (.text:_nop)
+                  00015208    00000002                            : startup.c.obj (.text:_system_post_cinit)
 
 MODULE SUMMARY
 
@@ -497,21 +502,22 @@ MODULE SUMMARY
        Total:                        640     0         0      
                                                               
     .\application\
-       application.obj               448     24        2473   
-       FFT.obj                       424     6         536    
-       audio_collect.obj             450     22        10     
+       application.obj               444     12        2474   
+       FFT.obj                       440     6         536    
+       audio_collect.obj             496     22        10     
        dac8311.obj                   122     0         0      
        audio_playback.obj            94      2         0      
        benchmark.obj                 18      2         4      
     +--+-----------------------------+-------+---------+---------+
-       Total:                        1556    56        3023   
+       Total:                        1614    44        3024   
                                                               
     .\driverlib\MSP430FR5xx_6xx\
        gpio.obj                      266     28        0      
        dma.obj                       290     0         0      
        timer_a.obj                   210     0         0      
+       adc12_b.obj                   64      0         0      
     +--+-----------------------------+-------+---------+---------+
-       Total:                        766     28        0      
+       Total:                        830     28        0      
                                                               
     C:\ti\ccs930\ccs\ccs_base\msp430\lib\FR59xx\MSPMPU_INIT_LIB_CCS_msp430_large_code_restricted_data.lib
        mpu_init.o                    44      0         0      
@@ -636,22 +642,22 @@ MODULE SUMMARY
                                                               
        Heap:                         0       0         1024   
        Stack:                        0       0         160    
-       Linker Generated:             0       137       0      
+       Linker Generated:             0       134       0      
     +--+-----------------------------+-------+---------+---------+
-       Grand Total:                  21306   582       5129   
+       Grand Total:                  21428   567       5130   
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 00004b96 records: 3, size/record: 8, table size: 24
-	.data: load addr=00004b24, load size=00000059 bytes, run addr=0000210c, run size=00000198 bytes, compression=lzss
-	.bss: load addr=00004b8a, load size=00000006 bytes, run addr=00001c00, run size=0000050c bytes, compression=zero_init
-	.leaRAM: load addr=00004b90, load size=00000006 bytes, run addr=00002c00, run size=000005a4 bytes, compression=zero_init
+__TI_cinit_table @ 00004b7e records: 3, size/record: 8, table size: 24
+	.data: load addr=00004b10, load size=00000056 bytes, run addr=0000210c, run size=0000019a bytes, compression=lzss
+	.bss: load addr=00004b72, load size=00000006 bytes, run addr=00001c00, run size=0000050c bytes, compression=zero_init
+	.leaRAM: load addr=00004b78, load size=00000006 bytes, run addr=00002c00, run size=000005a4 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 00004b7e records: 3, size/record: 4, table size: 12
+__TI_handler_table @ 00004b66 records: 3, size/record: 4, table size: 12
 	index: 0, handler: __TI_zero_init
 	index: 1, handler: __TI_decompress_lzss
 	index: 2, handler: __TI_decompress_none
@@ -892,7 +898,10 @@ address   name
 00000872  ADC12MEM9                               
 00000873  ADC12MEM9_H                             
 00000872  ADC12MEM9_L                             
-000049a0  ADC12_ISR                               
+00015190  ADC12_B_disable                         
+00014dda  ADC12_B_disableConversions              
+000151a8  ADC12_B_isBusy                          
+00004998  ADC12_ISR                               
 000009c0  AESACTL0                                
 000009c1  AESACTL0_H                              
 000009c0  AESACTL0_L                              
@@ -917,19 +926,21 @@ address   name
 000009ce  AESAXIN                                 
 000009cf  AESAXIN_H                               
 000009ce  AESAXIN_L                               
-00014f1e  Audio_getActiveBuffer                   
-00012f30  Audio_setupCollect                      
-00014e84  Audio_startCollect                      
-00014e18  Audio_stopPlayback                      
-000143b2  Audio_switchBuffer                      
+00014f7c  Audio_getActiveBuffer                   
+00012f40  Audio_setupCollect                      
+00015158  Audio_shutdownCollect                   
+00014ec2  Audio_startCollect                      
+00014ee4  Audio_stopCollect                       
+00014e56  Audio_stopPlayback                      
+000143c6  Audio_switchBuffer                      
 000004be  BCD2BIN                                 
 000004bf  BCD2BIN_H                               
 000004be  BCD2BIN_L                               
 000004bc  BIN2BCD                                 
 000004bd  BIN2BCD_H                               
 000004bc  BIN2BCD_L                               
-00015176  C$$EXIT                                 
-00014b5a  C$$IO$$                                 
+000151f8  C$$EXIT                                 
+00014b6e  C$$IO$$                                 
 0000043e  CAPTIO0CTL                              
 0000043f  CAPTIO0CTL_H                            
 0000043e  CAPTIO0CTL_L                            
@@ -1023,8 +1034,8 @@ address   name
 0000016c  CSCTL6                                  
 0000016d  CSCTL6_H                                
 0000016c  CSCTL6_L                                
-00014faa  DAC8311_setLowPowerMode                 
-00015130  DAC8311_updateDacOut                    
+00015008  DAC8311_setLowPowerMode                 
+000151b2  DAC8311_updateDacOut                    
 00000510  DMA0CTL                                 
 00000511  DMA0CTL_H                               
 00000510  DMA0CTL_L                               
@@ -1112,14 +1123,14 @@ address   name
 0000050e  DMAIV                                   
 0000050f  DMAIV_H                                 
 0000050e  DMAIV_L                                 
-000150fa  DMA_disableInterrupt                    
-0001515e  DMA_disableTransferDuringReadModifyWrite
-000150aa  DMA_disableTransfers                    
-00015108  DMA_enableInterrupt                     
-000150ba  DMA_enableTransfers                     
-00013c10  DMA_init                                
-00014c28  DMA_setDstAddress                       
-00014c88  DMA_setSrcAddress                       
+00015166  DMA_disableInterrupt                    
+000151e0  DMA_disableTransferDuringReadModifyWrite
+00015108  DMA_disableTransfers                    
+00015174  DMA_enableInterrupt                     
+00015118  DMA_enableTransfers                     
+00013c24  DMA_init                                
+00014c3c  DMA_setDstAddress                       
+00014c9c  DMA_setSrcAddress                       
 00004000  FFT_data                                
 00000140  FRCTL0                                  
 00000141  FRCTL0_H                                
@@ -1130,20 +1141,20 @@ address   name
 00000146  GCCTL1                                  
 00000147  GCCTL1_H                                
 00000146  GCCTL1_L                                
-00014ea6  GPIO_clearInterrupt                     
-00014ec4  GPIO_disableInterrupt                   
-00014ee2  GPIO_enableInterrupt                    
-00014cb6  GPIO_selectInterruptEdge                
-00014764  GPIO_setAsInputPinWithPullUpResistor    
-00014f3a  GPIO_setOutputHighOnPin                 
-00014f56  GPIO_setOutputLowOnPin                  
-000146c8  HOSTclose                               
-000139c6  HOSTlseek                               
-000140d6  HOSTopen                                
-000141b2  HOSTread                                
-00013f7a  HOSTrename                              
-0001488c  HOSTunlink                              
-00014146  HOSTwrite                               
+00014f04  GPIO_clearInterrupt                     
+00014f22  GPIO_disableInterrupt                   
+00014f40  GPIO_enableInterrupt                    
+00014cca  GPIO_selectInterruptEdge                
+00014778  GPIO_setAsInputPinWithPullUpResistor    
+00014f98  GPIO_setOutputHighOnPin                 
+00014fb4  GPIO_setOutputLowOnPin                  
+000146dc  HOSTclose                               
+000139da  HOSTlseek                               
+000140ea  HOSTopen                                
+000141c6  HOSTread                                
+00013f8e  HOSTrename                              
+000148a0  HOSTunlink                              
+0001415a  HOSTwrite                               
 00000a80  LEACAP                                  
 00000a82  LEACAPH                                 
 00000a80  LEACAPL                                 
@@ -1842,13 +1853,13 @@ address   name
 000003d0  TB0R                                    
 000003d1  TB0R_H                                  
 000003d0  TB0R_L                                  
-0000498e  TIMER2_A1_ISR                           
-00015164  Timer_A_clear                           
-0001513a  Timer_A_clearCaptureCompareInterrupt    
-00014aba  Timer_A_initCompareMode                 
-00013e10  Timer_A_initUpMode                      
-0001516a  Timer_A_startCounter                    
-0001514e  Timer_A_stop                            
+00004986  TIMER2_A1_ISR                           
+000151e6  Timer_A_clear                           
+000151bc  Timer_A_clearCaptureCompareInterrupt    
+00014ace  Timer_A_initCompareMode                 
+00013e24  Timer_A_initUpMode                      
+000151ec  Timer_A_startCounter                    
+000151d0  Timer_A_stop                            
 000005d0  UCA0ABCTL                               
 000005d1  UCA0ABCTL_H                             
 000005d0  UCA0ABCTL_L                             
@@ -2204,24 +2215,24 @@ address   name
 00002c00  __STACK_END                             
 000000a0  __STACK_SIZE                            
 00000400  __SYSMEM_SIZE                           
-00004b96  __TI_CINIT_Base                         
-00004bae  __TI_CINIT_Limit                        
-00004b7e  __TI_Handler_Table_Base                 
-00004b8a  __TI_Handler_Table_Limit                
-000049aa  __TI_ISR_TRAP                           
-00014622  __TI_auto_init_nobinit_nopinit_hold_wdt 
-00014af2  __TI_cleanup                            
-00002288  __TI_cleanup_ptr                        
-00013fee  __TI_closefile                          
-00013f04  __TI_decompress_lzss                    
-00015074  __TI_decompress_none                    
-000142ec  __TI_doflush                            
-0000228c  __TI_dtors_ptr                          
-000022a0  __TI_enable_exit_profile_output         
+00004b7e  __TI_CINIT_Base                         
+00004b96  __TI_CINIT_Limit                        
+00004b66  __TI_Handler_Table_Base                 
+00004b72  __TI_Handler_Table_Limit                
+000049a2  __TI_ISR_TRAP                           
+00014636  __TI_auto_init_nobinit_nopinit_hold_wdt 
+00014b06  __TI_cleanup                            
+0000228e  __TI_cleanup_ptr                        
+00014002  __TI_closefile                          
+00013f18  __TI_decompress_lzss                    
+000150d2  __TI_decompress_none                    
+00014300  __TI_doflush                            
+00002292  __TI_dtors_ptr                          
+000022a2  __TI_enable_exit_profile_output         
 00011702  __TI_frcaddd                            
 00010000  __TI_frcdivd                            
 00010d3a  __TI_frcmpyd                            
-0000229c  __TI_ft_end                             
+0000229e  __TI_ft_end                             
 0000ffb4  __TI_int18                              
 0000ffb6  __TI_int19                              
 0000ffb8  __TI_int20                              
@@ -2263,183 +2274,184 @@ ffffffff  __TI_pprof_out_hndl
 00010a94  __TI_printfi                            
 ffffffff  __TI_prof_data_size                     
 ffffffff  __TI_prof_data_start                    
-00014b92  __TI_readmsg                            
-0001368c  __TI_renormd                            
+00014ba6  __TI_readmsg                            
+0001369c  __TI_renormd                            
 00002000  __TI_tmpnams                            
-00014b28  __TI_writemsg                           
-00013d92  __TI_wrt_ok                             
-00014e3c  __TI_zero_init                          
+00014b3c  __TI_writemsg                           
+00013da6  __TI_wrt_ok                             
+00014e7a  __TI_zero_init                          
 ffffffff  __c_args__                              
 00000001  __mpu_enable                            
-00014d6e  __mpu_init                              
+00014d82  __mpu_init                              
 000107b4  __mspabi_addd                           
-000134ec  __mspabi_cmpd                           
+000134fc  __mspabi_cmpd                           
 00011b6e  __mspabi_divd                           
-000148d2  __mspabi_divli                          
-00015034  __mspabi_divu                           
-00014574  __mspabi_divul                          
+000148e6  __mspabi_divli                          
+00015092  __mspabi_divu                           
+00014588  __mspabi_divul                          
 00010466  __mspabi_divull                         
-00014df0  __mspabi_fixdi                          
-00014286  __mspabi_fixdli                         
-00015124  __mspabi_fltid                          
-0001388a  __mspabi_fltlid                         
+00014e2e  __mspabi_fixdi                          
+0001429a  __mspabi_fixdli                         
+0001519c  __mspabi_fltid                          
+0001393c  __mspabi_fltlid                         
 0001149c  __mspabi_mpyd                           
-00014fc4  __mspabi_mpyi_f5hw                      
-00014e60  __mspabi_mpyl_f5hw                      
-00014ce4  __mspabi_negd                           
-000148d2  __mspabi_remli                          
-00015034  __mspabi_remu                           
-00014574  __mspabi_remul                          
-000150da  __mspabi_slll                           
-00014988  __mspabi_slll_1                         
-00014964  __mspabi_slll_10                        
-00014960  __mspabi_slll_11                        
-0001495c  __mspabi_slll_12                        
-00014958  __mspabi_slll_13                        
-00014954  __mspabi_slll_14                        
-00014950  __mspabi_slll_15                        
-00014984  __mspabi_slll_2                         
-00014980  __mspabi_slll_3                         
-0001497c  __mspabi_slll_4                         
-00014978  __mspabi_slll_5                         
-00014974  __mspabi_slll_6                         
-00014970  __mspabi_slll_7                         
-0001496c  __mspabi_slll_8                         
-00014968  __mspabi_slll_9                         
-00014a46  __mspabi_sllll                          
-000150ca  __mspabi_sral                           
-0001494a  __mspabi_sral_1                         
-00014926  __mspabi_sral_10                        
-00014922  __mspabi_sral_11                        
-0001491e  __mspabi_sral_12                        
-0001491a  __mspabi_sral_13                        
-00014916  __mspabi_sral_14                        
-00014912  __mspabi_sral_15                        
-00014946  __mspabi_sral_2                         
-00014942  __mspabi_sral_3                         
-0001493e  __mspabi_sral_4                         
-0001493a  __mspabi_sral_5                         
-00014936  __mspabi_sral_6                         
-00014932  __mspabi_sral_7                         
-0001492e  __mspabi_sral_8                         
-0001492a  __mspabi_sral_9                         
-000150ea  __mspabi_srll                           
-000149c6  __mspabi_srll_1                         
-000149a2  __mspabi_srll_10                        
-0001499e  __mspabi_srll_11                        
-0001499a  __mspabi_srll_12                        
-00014996  __mspabi_srll_13                        
-00014992  __mspabi_srll_14                        
-0001498e  __mspabi_srll_15                        
-000149c2  __mspabi_srll_2                         
-000149be  __mspabi_srll_3                         
-000149ba  __mspabi_srll_4                         
-000149b6  __mspabi_srll_5                         
-000149b2  __mspabi_srll_6                         
-000149ae  __mspabi_srll_7                         
-000149aa  __mspabi_srll_8                         
-000149a6  __mspabi_srll_9                         
-00014a80  __mspabi_srlll                          
-00014bc4  __mspabi_subd                           
-00004952  _c_int00_noargs_mpu                     
-000049b2  _ctypes_                                
+00015022  __mspabi_mpyi_f5hw                      
+00014e9e  __mspabi_mpyl_f5hw                      
+00014cf8  __mspabi_negd                           
+000148e6  __mspabi_remli                          
+00015092  __mspabi_remu                           
+00014588  __mspabi_remul                          
+00015138  __mspabi_slll                           
+0001499c  __mspabi_slll_1                         
+00014978  __mspabi_slll_10                        
+00014974  __mspabi_slll_11                        
+00014970  __mspabi_slll_12                        
+0001496c  __mspabi_slll_13                        
+00014968  __mspabi_slll_14                        
+00014964  __mspabi_slll_15                        
+00014998  __mspabi_slll_2                         
+00014994  __mspabi_slll_3                         
+00014990  __mspabi_slll_4                         
+0001498c  __mspabi_slll_5                         
+00014988  __mspabi_slll_6                         
+00014984  __mspabi_slll_7                         
+00014980  __mspabi_slll_8                         
+0001497c  __mspabi_slll_9                         
+00014a5a  __mspabi_sllll                          
+00015128  __mspabi_sral                           
+0001495e  __mspabi_sral_1                         
+0001493a  __mspabi_sral_10                        
+00014936  __mspabi_sral_11                        
+00014932  __mspabi_sral_12                        
+0001492e  __mspabi_sral_13                        
+0001492a  __mspabi_sral_14                        
+00014926  __mspabi_sral_15                        
+0001495a  __mspabi_sral_2                         
+00014956  __mspabi_sral_3                         
+00014952  __mspabi_sral_4                         
+0001494e  __mspabi_sral_5                         
+0001494a  __mspabi_sral_6                         
+00014946  __mspabi_sral_7                         
+00014942  __mspabi_sral_8                         
+0001493e  __mspabi_sral_9                         
+00015148  __mspabi_srll                           
+000149da  __mspabi_srll_1                         
+000149b6  __mspabi_srll_10                        
+000149b2  __mspabi_srll_11                        
+000149ae  __mspabi_srll_12                        
+000149aa  __mspabi_srll_13                        
+000149a6  __mspabi_srll_14                        
+000149a2  __mspabi_srll_15                        
+000149d6  __mspabi_srll_2                         
+000149d2  __mspabi_srll_3                         
+000149ce  __mspabi_srll_4                         
+000149ca  __mspabi_srll_5                         
+000149c6  __mspabi_srll_6                         
+000149c2  __mspabi_srll_7                         
+000149be  __mspabi_srll_8                         
+000149ba  __mspabi_srll_9                         
+00014a94  __mspabi_srlll                          
+00014bd8  __mspabi_subd                           
+0000494a  _c_int00_noargs_mpu                     
+000049aa  _ctypes_                                
 000021d4  _device                                 
 0000210c  _ftable                                 
-00002290  _lock                                   
-00015184  _nop                                    
+00002296  _lock                                   
+00015206  _nop                                    
 0000fffe  _reset_vector                           
 00002b60  _stack                                  
 0000224c  _stream                                 
 00004324  _sys_memory                             
-00015186  _system_post_cinit                      
-00015180  _system_pre_init                        
-00002294  _unlock                                 
-00015176  abort                                   
-00015144  abs                                     
+00015208  _system_post_cinit                      
+00015202  _system_pre_init                        
+0000229a  _unlock                                 
+000151f8  abort                                   
+000151c6  abs                                     
 00001c00  adcBuffer0                              
 00001e00  adcBuffer1                              
-00012cdc  aligned_alloc                           
-00014350  atoi                                    
-00014410  close                                   
+00012cec  aligned_alloc                           
+00014364  atoi                                    
+00014424  close                                   
 000020e0  complexFftParams                        
-00014d12  copysign                                
-00014d12  copysignl                               
+00014d26  copysign                                
+00014d26  copysignl                               
 000020f4  cycleCounts                             
-0000229a  dacBufferPlaybackPointer                
-0000489c  dmaIsrHandler                           
-0000229e  errno                                   
-000147ae  exit                                    
-000144c4  fflush                                  
-00014d40  finddevice                              
-00013b80  fputc                                   
-00013152  fputs                                   
+0000228a  dacBufferPlaybackPointer                
+00004894  dmaIsrHandler                           
+000022a0  errno                                   
+000147c2  exit                                    
+000144d8  fflush                                  
+00014d54  finddevice                              
+00013b94  fputc                                   
+00013162  fputs                                   
 00004800  fram_ipe_end                            
 00004800  fram_ipe_start                          
 00004000  fram_rw_start                           
 00004800  fram_rx_start                           
-0001332c  free                                    
-000137e4  frexp                                   
-000137e4  frexpl                                  
-0001421c  fseek                                   
+0001333c  free                                    
+000137f4  frexp                                   
+000137f4  frexpl                                  
+00014230  fseek                                   
+0000228c  fyrstaSkipti                            
 000020c6  gAudioConfig                            
 000020a0  gPlaybackConfig                         
-0001446a  getdevice                               
+0001447e  getdevice                               
 000020f8  i                                       
 000020fa  imag                                    
 000020fc  imag_abs                                
-00014b5e  initClock                               
-000147f8  initFft                                 
-00013c92  initGpio                                
+00014b72  initClock                               
+0001480c  initFft                                 
+00013ca6  initGpio                                
 00004200  keepAppRunning                          
-000127ba  ldexp                                   
-000127ba  ldexpl                                  
+000127ca  ldexp                                   
+000127ca  ldexpl                                  
 00002c00  leaMemoryStartAdd                       
-000149cc  lseek                                   
-00013d12  ltoa                                    
+000149e0  lseek                                   
+00013d26  ltoa                                    
 000020fe  mag                                     
-0001451c  main                                    
-00015156  malloc                                  
+00014530  main                                    
+000151d8  malloc                                  
 00002100  max                                     
-00012cdc  memalign                                
-00014f00  memccpy                                 
-00014ff2  memchr                                  
-00015060  memcpy                                  
-00015008  memset                                  
+00012cec  memalign                                
+00014f5e  memccpy                                 
+00015050  memchr                                  
+000150be  memcpy                                  
+00015066  memset                                  
 00002102  min                                     
 0000a501  mpu_ctl0_value                          
 00001513  mpu_sam_value                           
 00000480  mpu_segment_border1                     
 00000480  mpu_segment_border2                     
-00012ba6  msp_cmplx_bitrev_q15                    
-00012914  msp_cmplx_fft_fixed_q15                 
+00012bb6  msp_cmplx_bitrev_q15                    
+00012924  msp_cmplx_fft_fixed_q15                 
 00002104  msp_lea_ifg                             
-00014676  msp_lea_init                            
-0001501e  msp_lea_initCommandTable                
-00004972  msp_lea_isr                             
+0001468a  msp_lea_init                            
+0001507c  msp_lea_initCommandTable                
+0000496a  msp_lea_isr                             
 00002106  msp_lea_locked                          
 000020e8  parmbuf                                 
-00002298  pointer                                 
+00002288  pointer                                 
 00004800  port5IsrHandler                         
-00014842  printf                                  
-00013b80  putc                                    
+00014856  printf                                  
+00013b94  putc                                    
 00002108  real                                    
 0000210a  real_abs                                
-00014c58  remove                                  
-00013928  runApplication                          
+00014c6c  remove                                  
+0001389a  runApplication                          
 0001265c  runFftWithLea                           
-000127ba  scalbn                                  
-000127ba  scalbnl                                 
-0001340e  setvbuf                                 
-00014f72  strchr                                  
-00014f8e  strcmp                                  
-00015086  strcpy                                  
-00015116  strlen                                  
-00014bf6  strncpy                                 
-00004918  timer2A0Isr                             
-00015098  toupper                                 
-00014c58  unlink                                  
-0001504a  wcslen                                  
-00014a0a  write                                   
+000127ca  scalbn                                  
+000127ca  scalbnl                                 
+0001341e  setvbuf                                 
+00014fd0  strchr                                  
+00014fec  strcmp                                  
+000150e4  strcpy                                  
+00015182  strlen                                  
+00014c0a  strncpy                                 
+00004910  timer2A0Isr                             
+000150f6  toupper                                 
+00014c6c  unlink                                  
+000150a8  wcslen                                  
+00014a1e  write                                   
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -3972,15 +3984,16 @@ address   name
 0000210c  _ftable                                 
 000021d4  _device                                 
 0000224c  _stream                                 
-00002288  __TI_cleanup_ptr                        
-0000228c  __TI_dtors_ptr                          
-00002290  _lock                                   
-00002294  _unlock                                 
-00002298  pointer                                 
-0000229a  dacBufferPlaybackPointer                
-0000229c  __TI_ft_end                             
-0000229e  errno                                   
-000022a0  __TI_enable_exit_profile_output         
+00002288  pointer                                 
+0000228a  dacBufferPlaybackPointer                
+0000228c  fyrstaSkipti                            
+0000228e  __TI_cleanup_ptr                        
+00002292  __TI_dtors_ptr                          
+00002296  _lock                                   
+0000229a  _unlock                                 
+0000229e  __TI_ft_end                             
+000022a0  errno                                   
+000022a2  __TI_enable_exit_profile_output         
 00002b60  _stack                                  
 00002c00  __STACK_END                             
 00002c00  leaMemoryStartAdd                       
@@ -3993,18 +4006,18 @@ address   name
 00004800  fram_ipe_start                          
 00004800  fram_rx_start                           
 00004800  port5IsrHandler                         
-0000489c  dmaIsrHandler                           
-00004918  timer2A0Isr                             
-00004952  _c_int00_noargs_mpu                     
-00004972  msp_lea_isr                             
-0000498e  TIMER2_A1_ISR                           
-000049a0  ADC12_ISR                               
-000049aa  __TI_ISR_TRAP                           
-000049b2  _ctypes_                                
-00004b7e  __TI_Handler_Table_Base                 
-00004b8a  __TI_Handler_Table_Limit                
-00004b96  __TI_CINIT_Base                         
-00004bae  __TI_CINIT_Limit                        
+00004894  dmaIsrHandler                           
+00004910  timer2A0Isr                             
+0000494a  _c_int00_noargs_mpu                     
+0000496a  msp_lea_isr                             
+00004986  TIMER2_A1_ISR                           
+00004998  ADC12_ISR                               
+000049a2  __TI_ISR_TRAP                           
+000049aa  _ctypes_                                
+00004b66  __TI_Handler_Table_Base                 
+00004b72  __TI_Handler_Table_Limit                
+00004b7e  __TI_CINIT_Base                         
+00004b96  __TI_CINIT_Limit                        
 0000a501  mpu_ctl0_value                          
 0000ffb4  __TI_int18                              
 0000ffb6  __TI_int19                              
@@ -4053,177 +4066,182 @@ address   name
 00011702  __TI_frcaddd                            
 00011b6e  __mspabi_divd                           
 0001265c  runFftWithLea                           
-000127ba  ldexp                                   
-000127ba  ldexpl                                  
-000127ba  scalbn                                  
-000127ba  scalbnl                                 
-00012914  msp_cmplx_fft_fixed_q15                 
-00012ba6  msp_cmplx_bitrev_q15                    
-00012cdc  aligned_alloc                           
-00012cdc  memalign                                
-00012f30  Audio_setupCollect                      
-00013152  fputs                                   
-0001332c  free                                    
-0001340e  setvbuf                                 
-000134ec  __mspabi_cmpd                           
-0001368c  __TI_renormd                            
-000137e4  frexp                                   
-000137e4  frexpl                                  
-0001388a  __mspabi_fltlid                         
-00013928  runApplication                          
-000139c6  HOSTlseek                               
-00013b80  fputc                                   
-00013b80  putc                                    
-00013c10  DMA_init                                
-00013c92  initGpio                                
-00013d12  ltoa                                    
-00013d92  __TI_wrt_ok                             
-00013e10  Timer_A_initUpMode                      
-00013f04  __TI_decompress_lzss                    
-00013f7a  HOSTrename                              
-00013fee  __TI_closefile                          
-000140d6  HOSTopen                                
-00014146  HOSTwrite                               
-000141b2  HOSTread                                
-0001421c  fseek                                   
-00014286  __mspabi_fixdli                         
-000142ec  __TI_doflush                            
-00014350  atoi                                    
-000143b2  Audio_switchBuffer                      
-00014410  close                                   
-0001446a  getdevice                               
-000144c4  fflush                                  
-0001451c  main                                    
-00014574  __mspabi_divul                          
-00014574  __mspabi_remul                          
-00014622  __TI_auto_init_nobinit_nopinit_hold_wdt 
-00014676  msp_lea_init                            
-000146c8  HOSTclose                               
-00014764  GPIO_setAsInputPinWithPullUpResistor    
-000147ae  exit                                    
-000147f8  initFft                                 
-00014842  printf                                  
-0001488c  HOSTunlink                              
-000148d2  __mspabi_divli                          
-000148d2  __mspabi_remli                          
-00014912  __mspabi_sral_15                        
-00014916  __mspabi_sral_14                        
-0001491a  __mspabi_sral_13                        
-0001491e  __mspabi_sral_12                        
-00014922  __mspabi_sral_11                        
-00014926  __mspabi_sral_10                        
-0001492a  __mspabi_sral_9                         
-0001492e  __mspabi_sral_8                         
-00014932  __mspabi_sral_7                         
-00014936  __mspabi_sral_6                         
-0001493a  __mspabi_sral_5                         
-0001493e  __mspabi_sral_4                         
-00014942  __mspabi_sral_3                         
-00014946  __mspabi_sral_2                         
-0001494a  __mspabi_sral_1                         
-00014950  __mspabi_slll_15                        
-00014954  __mspabi_slll_14                        
-00014958  __mspabi_slll_13                        
-0001495c  __mspabi_slll_12                        
-00014960  __mspabi_slll_11                        
-00014964  __mspabi_slll_10                        
-00014968  __mspabi_slll_9                         
-0001496c  __mspabi_slll_8                         
-00014970  __mspabi_slll_7                         
-00014974  __mspabi_slll_6                         
-00014978  __mspabi_slll_5                         
-0001497c  __mspabi_slll_4                         
-00014980  __mspabi_slll_3                         
-00014984  __mspabi_slll_2                         
-00014988  __mspabi_slll_1                         
-0001498e  __mspabi_srll_15                        
-00014992  __mspabi_srll_14                        
-00014996  __mspabi_srll_13                        
-0001499a  __mspabi_srll_12                        
-0001499e  __mspabi_srll_11                        
-000149a2  __mspabi_srll_10                        
-000149a6  __mspabi_srll_9                         
-000149aa  __mspabi_srll_8                         
-000149ae  __mspabi_srll_7                         
-000149b2  __mspabi_srll_6                         
-000149b6  __mspabi_srll_5                         
-000149ba  __mspabi_srll_4                         
-000149be  __mspabi_srll_3                         
-000149c2  __mspabi_srll_2                         
-000149c6  __mspabi_srll_1                         
-000149cc  lseek                                   
-00014a0a  write                                   
-00014a46  __mspabi_sllll                          
-00014a80  __mspabi_srlll                          
-00014aba  Timer_A_initCompareMode                 
-00014af2  __TI_cleanup                            
-00014b28  __TI_writemsg                           
-00014b5a  C$$IO$$                                 
-00014b5e  initClock                               
-00014b92  __TI_readmsg                            
-00014bc4  __mspabi_subd                           
-00014bf6  strncpy                                 
-00014c28  DMA_setDstAddress                       
-00014c58  remove                                  
-00014c58  unlink                                  
-00014c88  DMA_setSrcAddress                       
-00014cb6  GPIO_selectInterruptEdge                
-00014ce4  __mspabi_negd                           
-00014d12  copysign                                
-00014d12  copysignl                               
-00014d40  finddevice                              
-00014d6e  __mpu_init                              
-00014df0  __mspabi_fixdi                          
-00014e18  Audio_stopPlayback                      
-00014e3c  __TI_zero_init                          
-00014e60  __mspabi_mpyl_f5hw                      
-00014e84  Audio_startCollect                      
-00014ea6  GPIO_clearInterrupt                     
-00014ec4  GPIO_disableInterrupt                   
-00014ee2  GPIO_enableInterrupt                    
-00014f00  memccpy                                 
-00014f1e  Audio_getActiveBuffer                   
-00014f3a  GPIO_setOutputHighOnPin                 
-00014f56  GPIO_setOutputLowOnPin                  
-00014f72  strchr                                  
-00014f8e  strcmp                                  
-00014faa  DAC8311_setLowPowerMode                 
-00014fc4  __mspabi_mpyi_f5hw                      
-00014ff2  memchr                                  
-00015008  memset                                  
-0001501e  msp_lea_initCommandTable                
-00015034  __mspabi_divu                           
-00015034  __mspabi_remu                           
-0001504a  wcslen                                  
-00015060  memcpy                                  
-00015074  __TI_decompress_none                    
-00015086  strcpy                                  
-00015098  toupper                                 
-000150aa  DMA_disableTransfers                    
-000150ba  DMA_enableTransfers                     
-000150ca  __mspabi_sral                           
-000150da  __mspabi_slll                           
-000150ea  __mspabi_srll                           
-000150fa  DMA_disableInterrupt                    
-00015108  DMA_enableInterrupt                     
-00015116  strlen                                  
-00015124  __mspabi_fltid                          
-00015130  DAC8311_updateDacOut                    
-0001513a  Timer_A_clearCaptureCompareInterrupt    
-00015144  abs                                     
-0001514e  Timer_A_stop                            
-00015156  malloc                                  
-0001515e  DMA_disableTransferDuringReadModifyWrite
-00015164  Timer_A_clear                           
-0001516a  Timer_A_startCounter                    
-00015176  C$$EXIT                                 
-00015176  abort                                   
-00015180  _system_pre_init                        
-00015184  _nop                                    
-00015186  _system_post_cinit                      
+000127ca  ldexp                                   
+000127ca  ldexpl                                  
+000127ca  scalbn                                  
+000127ca  scalbnl                                 
+00012924  msp_cmplx_fft_fixed_q15                 
+00012bb6  msp_cmplx_bitrev_q15                    
+00012cec  aligned_alloc                           
+00012cec  memalign                                
+00012f40  Audio_setupCollect                      
+00013162  fputs                                   
+0001333c  free                                    
+0001341e  setvbuf                                 
+000134fc  __mspabi_cmpd                           
+0001369c  __TI_renormd                            
+000137f4  frexp                                   
+000137f4  frexpl                                  
+0001389a  runApplication                          
+0001393c  __mspabi_fltlid                         
+000139da  HOSTlseek                               
+00013b94  fputc                                   
+00013b94  putc                                    
+00013c24  DMA_init                                
+00013ca6  initGpio                                
+00013d26  ltoa                                    
+00013da6  __TI_wrt_ok                             
+00013e24  Timer_A_initUpMode                      
+00013f18  __TI_decompress_lzss                    
+00013f8e  HOSTrename                              
+00014002  __TI_closefile                          
+000140ea  HOSTopen                                
+0001415a  HOSTwrite                               
+000141c6  HOSTread                                
+00014230  fseek                                   
+0001429a  __mspabi_fixdli                         
+00014300  __TI_doflush                            
+00014364  atoi                                    
+000143c6  Audio_switchBuffer                      
+00014424  close                                   
+0001447e  getdevice                               
+000144d8  fflush                                  
+00014530  main                                    
+00014588  __mspabi_divul                          
+00014588  __mspabi_remul                          
+00014636  __TI_auto_init_nobinit_nopinit_hold_wdt 
+0001468a  msp_lea_init                            
+000146dc  HOSTclose                               
+00014778  GPIO_setAsInputPinWithPullUpResistor    
+000147c2  exit                                    
+0001480c  initFft                                 
+00014856  printf                                  
+000148a0  HOSTunlink                              
+000148e6  __mspabi_divli                          
+000148e6  __mspabi_remli                          
+00014926  __mspabi_sral_15                        
+0001492a  __mspabi_sral_14                        
+0001492e  __mspabi_sral_13                        
+00014932  __mspabi_sral_12                        
+00014936  __mspabi_sral_11                        
+0001493a  __mspabi_sral_10                        
+0001493e  __mspabi_sral_9                         
+00014942  __mspabi_sral_8                         
+00014946  __mspabi_sral_7                         
+0001494a  __mspabi_sral_6                         
+0001494e  __mspabi_sral_5                         
+00014952  __mspabi_sral_4                         
+00014956  __mspabi_sral_3                         
+0001495a  __mspabi_sral_2                         
+0001495e  __mspabi_sral_1                         
+00014964  __mspabi_slll_15                        
+00014968  __mspabi_slll_14                        
+0001496c  __mspabi_slll_13                        
+00014970  __mspabi_slll_12                        
+00014974  __mspabi_slll_11                        
+00014978  __mspabi_slll_10                        
+0001497c  __mspabi_slll_9                         
+00014980  __mspabi_slll_8                         
+00014984  __mspabi_slll_7                         
+00014988  __mspabi_slll_6                         
+0001498c  __mspabi_slll_5                         
+00014990  __mspabi_slll_4                         
+00014994  __mspabi_slll_3                         
+00014998  __mspabi_slll_2                         
+0001499c  __mspabi_slll_1                         
+000149a2  __mspabi_srll_15                        
+000149a6  __mspabi_srll_14                        
+000149aa  __mspabi_srll_13                        
+000149ae  __mspabi_srll_12                        
+000149b2  __mspabi_srll_11                        
+000149b6  __mspabi_srll_10                        
+000149ba  __mspabi_srll_9                         
+000149be  __mspabi_srll_8                         
+000149c2  __mspabi_srll_7                         
+000149c6  __mspabi_srll_6                         
+000149ca  __mspabi_srll_5                         
+000149ce  __mspabi_srll_4                         
+000149d2  __mspabi_srll_3                         
+000149d6  __mspabi_srll_2                         
+000149da  __mspabi_srll_1                         
+000149e0  lseek                                   
+00014a1e  write                                   
+00014a5a  __mspabi_sllll                          
+00014a94  __mspabi_srlll                          
+00014ace  Timer_A_initCompareMode                 
+00014b06  __TI_cleanup                            
+00014b3c  __TI_writemsg                           
+00014b6e  C$$IO$$                                 
+00014b72  initClock                               
+00014ba6  __TI_readmsg                            
+00014bd8  __mspabi_subd                           
+00014c0a  strncpy                                 
+00014c3c  DMA_setDstAddress                       
+00014c6c  remove                                  
+00014c6c  unlink                                  
+00014c9c  DMA_setSrcAddress                       
+00014cca  GPIO_selectInterruptEdge                
+00014cf8  __mspabi_negd                           
+00014d26  copysign                                
+00014d26  copysignl                               
+00014d54  finddevice                              
+00014d82  __mpu_init                              
+00014dda  ADC12_B_disableConversions              
+00014e2e  __mspabi_fixdi                          
+00014e56  Audio_stopPlayback                      
+00014e7a  __TI_zero_init                          
+00014e9e  __mspabi_mpyl_f5hw                      
+00014ec2  Audio_startCollect                      
+00014ee4  Audio_stopCollect                       
+00014f04  GPIO_clearInterrupt                     
+00014f22  GPIO_disableInterrupt                   
+00014f40  GPIO_enableInterrupt                    
+00014f5e  memccpy                                 
+00014f7c  Audio_getActiveBuffer                   
+00014f98  GPIO_setOutputHighOnPin                 
+00014fb4  GPIO_setOutputLowOnPin                  
+00014fd0  strchr                                  
+00014fec  strcmp                                  
+00015008  DAC8311_setLowPowerMode                 
+00015022  __mspabi_mpyi_f5hw                      
+00015050  memchr                                  
+00015066  memset                                  
+0001507c  msp_lea_initCommandTable                
+00015092  __mspabi_divu                           
+00015092  __mspabi_remu                           
+000150a8  wcslen                                  
+000150be  memcpy                                  
+000150d2  __TI_decompress_none                    
+000150e4  strcpy                                  
+000150f6  toupper                                 
+00015108  DMA_disableTransfers                    
+00015118  DMA_enableTransfers                     
+00015128  __mspabi_sral                           
+00015138  __mspabi_slll                           
+00015148  __mspabi_srll                           
+00015158  Audio_shutdownCollect                   
+00015166  DMA_disableInterrupt                    
+00015174  DMA_enableInterrupt                     
+00015182  strlen                                  
+00015190  ADC12_B_disable                         
+0001519c  __mspabi_fltid                          
+000151a8  ADC12_B_isBusy                          
+000151b2  DAC8311_updateDacOut                    
+000151bc  Timer_A_clearCaptureCompareInterrupt    
+000151c6  abs                                     
+000151d0  Timer_A_stop                            
+000151d8  malloc                                  
+000151e0  DMA_disableTransferDuringReadModifyWrite
+000151e6  Timer_A_clear                           
+000151ec  Timer_A_startCounter                    
+000151f8  C$$EXIT                                 
+000151f8  abort                                   
+00015202  _system_pre_init                        
+00015206  _nop                                    
+00015208  _system_post_cinit                      
 ffffffff  __TI_pprof_out_hndl                     
 ffffffff  __TI_prof_data_size                     
 ffffffff  __TI_prof_data_start                    
 ffffffff  __c_args__                              
 
-[1779 symbols]
+[1785 symbols]
