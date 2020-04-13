@@ -11,6 +11,6 @@
 	<rts value="libc.a"/>
 	<createSlaveProjects value=""/>
 	<templateProperties value="id=BOOSTXL-AUDIO_430BOOST-SHARP96_FFT_FIR_LEA_MSP430FR5994.projectspec.BOOSTXL-AUDIO_430BOOST-SHARP96_FFT_FIR_LEA_MSP430FR5994"/>
-	<origin value="C:\ti\msp430ware_3_80_07_00\examples\boards\MSP-EXP430FR5994\MSP-EXP430FR5994_Software_Examples\Firmware\Source\BOOSTXL-AUDIO_430BOOST-SHARP96_FFT_FIR_LEA_MSP430FR5994\CCS\BOOSTXL-AUDIO_430BOOST-SHARP96_FFT_FIR_LEA_MSP430FR5994.projectspec"/>
+	<origin value="C:/Users/Hjalti/workspace_v9/Test_verkefni"/>
 	<filesToOpen value="main.c"/>
 </projectOptions>

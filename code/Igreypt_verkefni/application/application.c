@@ -42,6 +42,7 @@
 #include <stdlib.h>
 #include "application.h"
 #include "global.h"
+#include <inttypes.h>
 
 #if defined(__IAR_SYSTEMS_ICC__)
 #pragma location="LEARAM"
@@ -56,6 +57,9 @@ LeaMemoryStartAdd leaMemoryStartAdd;
 // They are being used by FFT and FIR buffers
 int16_t adcBuffer0[MAXIMUM_ARRAY_SIZE];
 int16_t adcBuffer1[MAXIMUM_ARRAY_SIZE];
+uint16_t pointer = 0;
+uint16_t i;
+char* FFT_data_char;
 
 // Temporary DAC output buffer
 #if defined(__IAR_SYSTEMS_ICC__)
@@ -77,17 +81,24 @@ __persistent bool keepAppRunning = false;
 #elif defined(__TI_COMPILER_VERSION__)
 #pragma PERSISTENT(keepAppRunning)
 bool keepAppRunning = false;
+bool fyrstaSkipti = false;
 #endif
 
 void runApplication(void)
 {
+    fyrstaSkipti = true;
     while(1)
     {
         //runFftWithLea();
-        //int pointer = 0;
-        //int fftvalue = __data20_read_short(&FFT_data[pointer++]);
-        //Pointer < VECTOR_SIZE/2 --> FFT.h
-
+        if(fyrstaSkipti == true){
+            runFftWithLea();
+            for(i = 0;i<(VECTOR_SIZE/2);i++){
+                int FFT_data_int = FFT_data[pointer++];
+                printf("%d \n",FFT_data_int);
+                fflush(stdout);
+            }
+        }
+        fyrstaSkipti = false;
         // Set a Switch debounce to 500ms
         __delay_cycles(0.5 * __SYSTEM_FREQUENCY_MHZ__);
 
@@ -122,7 +133,7 @@ __interrupt void port5IsrHandler(void)
     case P5IV_P5IFG3: break;
     case P5IV_P5IFG4: break;
     case P5IV_P5IFG5:
-        runFftWithLea();
+
 
             // Stop the running application
             keepAppRunning = false;
@@ -135,7 +146,13 @@ __interrupt void port5IsrHandler(void)
 
         break;
     case P5IV_P5IFG6:
-
+        runFftWithLea();
+        pointer = 0;
+        for(i = 0;i<(VECTOR_SIZE/2);i++){
+            int FFT_data_int = FFT_data[pointer++];
+            printf("%d \n",FFT_data_int);
+            fflush(stdout);
+        }
         // Stop the running application
         keepAppRunning = false;
 
@@ -161,6 +178,10 @@ __interrupt void dmaIsrHandler(void)
     case DMAIV_DMA0IFG:
         // Switch the audio buffer for ping-pong buffer
         Audio_switchBuffer(&gAudioConfig);
+
+        //shutdown audio collect
+        //Audio_stopCollect(&gAudioConfig);
+        //Audio_shutdownCollect(&gAudioConfig);
 
         // Exit low power mode on wake-up
         __bic_SR_register_on_exit(LPM4_bits);

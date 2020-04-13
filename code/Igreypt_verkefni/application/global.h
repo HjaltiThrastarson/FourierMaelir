@@ -39,6 +39,12 @@
 #ifndef GLOBAL_H_
 #define GLOBAL_H_
 #define VECTOR_SIZE 256
+#define LOG2_SIZE       8
+#define SQRT_SIZE       16
+#define SCALE_FACTOR    0x00026000
+#define MAXIMUM_ARRAY_SIZE              256
+#define FFT_SAMPLING_FREQUENCY          20000
+#define FIR_SAMPLING_FREQUENCY          20000
 #include "audio_collect.h"
 #include "audio_playback.h"
 #include "grlib.h"
@@ -52,5 +58,6 @@ extern Graphics_Context g_sContext;
 extern int16_t FFT_data[VECTOR_SIZE];
 extern bool keepAppRunning;
 extern void * leaRamStartAddress;
+
 
 #endif /* GLOBAL_H_ */
