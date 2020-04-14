@@ -179,6 +179,7 @@ void runFftWithLea(void)
     int32_t NEW_VALUE;
 
     // Initialize LEA module
+	//Kveikir einnig á söfnun
     initFft();
 
 

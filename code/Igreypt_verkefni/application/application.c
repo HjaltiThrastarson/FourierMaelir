@@ -83,7 +83,7 @@ __persistent bool keepAppRunning = false;
 bool keepAppRunning = false;
 bool fyrstaSkipti = false;
 #endif
-
+//Keyra fyrstu lykkju
 void runApplication(void)
 {
     fyrstaSkipti = true;
@@ -134,7 +134,7 @@ __interrupt void port5IsrHandler(void)
     case P5IV_P5IFG4: break;
     case P5IV_P5IFG5:
 
-
+			
             // Stop the running application
             keepAppRunning = false;
 
@@ -146,6 +146,7 @@ __interrupt void port5IsrHandler(void)
 
         break;
     case P5IV_P5IFG6:
+		//Keyra FFT dótið ef ýtt er á takka
         runFftWithLea();
         pointer = 0;
         for(i = 0;i<(VECTOR_SIZE/2);i++){
